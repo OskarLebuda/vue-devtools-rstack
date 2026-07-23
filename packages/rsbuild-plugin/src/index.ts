@@ -1,24 +1,15 @@
 import type { RsbuildPlugin } from '@rsbuild/core'
-import type { VueDevToolsOptions } from '@vue-devtools-rspack/core'
+import type { DevtoolsServer, VueDevToolsOptions } from '@vue-devtools-rspack/core'
+import { createRequire } from 'node:module'
+import { isAbsolute, join } from 'node:path'
 import {
-  combineChannels,
-  createAssetsWatcher,
-  createClientMiddleware,
-  createOpenInEditorMiddleware,
-  createOverlayAssetsMiddleware,
-  createSseTransport,
-  createViteClientShimMiddleware,
-  createWsTransport,
+  createDevtoolsServer,
   getBootstrapScriptTag,
   GraphCollector,
   normalizeBase,
-  resolveDevtoolsDirs,
   resolveVueDevToolsOptions,
-  setupDevtoolsRpc,
 } from '@vue-devtools-rspack/core'
-import { isAbsolute, join } from 'node:path'
 import { bold, cyan, green } from 'kolorist'
-import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 
@@ -30,10 +21,13 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
 
     setup(api) {
       const resolved = resolveVueDevToolsOptions(options)
+      const collector = new GraphCollector()
+      let server: DevtoolsServer | undefined
 
       const isDev = () => api.context.action === 'dev'
       const getBase = () => normalizeBase(api.getNormalizedConfig().server.base)
 
+      // -- overlay injection --------------------------------------------------
       api.modifyHTMLTags(({ headTags, bodyTags }) => {
         if (!isDev() || resolved.appendTo)
           return { headTags, bodyTags }
@@ -41,10 +35,10 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         return { headTags, bodyTags }
       })
 
-      // -- component inspector (click-to-source) ---------------------------
+      // -- component inspector (click-to-source) ------------------------------
       if (resolved.componentInspector) {
         api.modifyRsbuildConfig((config) => {
-          if (api.context.action !== 'dev')
+          if (!isDev())
             return config
           const runtime = require.resolve('@vue-devtools-rspack/core/inspector-runtime')
           config.source ??= {}
@@ -63,6 +57,8 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
             = typeof resolved.componentInspector === 'object' ? resolved.componentInspector : {}
           config.module ??= {}
           config.module.rules ??= []
+          // `enforce: 'pre'` so the transform sees the original SFC source,
+          // before vue-loader splits the blocks.
           config.module.rules.unshift({
             test: /\.vue$/,
             exclude: /node_modules/,
@@ -81,9 +77,7 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         })
       }
 
-      const closers: (() => void)[] = []
-      const collector = new GraphCollector()
-
+      // -- module graph -------------------------------------------------------
       api.onAfterDevCompile(({ stats }) => {
         collector.handleStatsJson(
           stats.toJson({
@@ -96,71 +90,29 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         )
       })
 
-      const resolvePublicDir = (): string => {
-        const publicDir = api.getNormalizedConfig().server.publicDir
-        if (!publicDir)
-          return ''
-        const first = Array.isArray(publicDir) ? publicDir[0] : publicDir
-        const name = (first && typeof first === 'object' ? first.name : undefined) ?? 'public'
-        return isAbsolute(name) ? name : join(api.context.rootPath, name)
-      }
-
-      api.onBeforeStartDevServer(({ server }) => {
-        const base = getBase()
-        const dirs = resolveDevtoolsDirs()
-        const forceSse = process.env.VUE_DEVTOOLS_RSPACK_FORCE_SSE === '1'
-
-        // -- static serving ------------------------------------------------
-        server.middlewares.use(`${base}__devtools__`, createClientMiddleware(dirs.clientDir))
-        server.middlewares.use(
-          `${base}__vue-devtools__`,
-          createOverlayAssetsMiddleware(dirs.overlayDir),
-        )
-        server.middlewares.use(
-          `${base}__open-in-editor`,
-          createOpenInEditorMiddleware(resolved.launchEditor),
-        )
-
-        // -- channel B: transports + vite-hot-client shim --------------------
-        const sse = createSseTransport()
-        const ws = createWsTransport(`${base}__vue-devtools-ws__`)
-        closers.push(() => sse.close(), () => ws.close())
-
-        if (!forceSse && server.httpServer) {
-          // Scoped to our pathname; the HMR socket's upgrades are untouched.
-          ws.attach(server.httpServer)
-        }
-        // The shim tries WS first and falls back to SSE by itself; when WS is
-        // unavailable (middlewareMode) or forced off, it goes straight to SSE.
-        server.middlewares.use(
-          `${base}@vite/client`,
-          createViteClientShimMiddleware(base, forceSse || !server.httpServer),
-        )
-        server.middlewares.use(`${base}__vue-devtools-sse__`, sse.streamMiddleware)
-        server.middlewares.use(`${base}__vue-devtools-send__`, sse.sendMiddleware)
-
-        setupDevtoolsRpc(combineChannels(ws.channel, sse.channel), {
+      // -- dev server ---------------------------------------------------------
+      api.onBeforeStartDevServer(({ server: devServer }) => {
+        server = createDevtoolsServer({
+          base: getBase(),
           root: api.context.rootPath,
-          base,
           publicDir: resolvePublicDir(),
+          distPath: api.context.distPath,
+          options: resolved,
           collector,
+          httpServer: devServer.httpServer,
+          use: (path, middleware) => devServer.middlewares.use(path, middleware),
         })
-
-        closers.push(
-          createAssetsWatcher(api.context.rootPath, [api.context.distPath]),
-        )
       })
 
       api.onCloseDevServer(() => {
-        for (const close of closers.splice(0))
-          close()
+        server?.close()
+        server = undefined
       })
 
       api.onAfterStartDevServer(({ port }) => {
         if (!isDev())
           return
-        const base = getBase()
-        const url = `http://localhost:${port}${base}__devtools__/`
+        const url = `http://localhost:${port}${getBase()}__devtools__/`
         // eslint-disable-next-line no-console
         console.log(
           `  ${green('➜')}  ${bold('Vue DevTools')}: Open ${cyan(url)} as a separate window`,
@@ -170,6 +122,15 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
           `  ${green('➜')}  ${bold('Vue DevTools')}: Press ${cyan('Option(⌥)+Shift(⇧)+D')} in App to toggle the Vue DevTools`,
         )
       })
+
+      function resolvePublicDir(): string {
+        const publicDir = api.getNormalizedConfig().server.publicDir
+        if (!publicDir)
+          return ''
+        const first = Array.isArray(publicDir) ? publicDir[0] : publicDir
+        const name = (first && typeof first === 'object' ? first.name : undefined) ?? 'public'
+        return isAbsolute(name) ? name : join(api.context.rootPath, name)
+      }
     },
   }
 }

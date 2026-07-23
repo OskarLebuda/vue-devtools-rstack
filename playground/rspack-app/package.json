@@ -1,0 +1,22 @@
+{
+  "name": "playground-rspack-app",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "rspack serve",
+    "build": "rspack build"
+  },
+  "dependencies": {
+    "pinia": "^4.0.2",
+    "vue": "^3.5.40",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^2.1.5",
+    "@rspack/core": "^2.1.5",
+    "@rspack/dev-server": "^2.1.0",
+    "@vue/compiler-sfc": "^3.5.40",
+    "rspack-plugin-vue-devtools": "workspace:*",
+    "vue-loader": "^17.4.2"
+  }
+}

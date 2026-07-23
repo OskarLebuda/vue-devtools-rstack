@@ -38,7 +38,8 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@vue-devtools-rspack/core": "workspace:*"
+    "@vue-devtools-rspack/core": "workspace:*",
+    "kolorist": "^1.8.0"
   },
   "peerDependencies": {
     "@rspack/core": "^1.0.0 || ^2.0.0"

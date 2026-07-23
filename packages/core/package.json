@@ -22,13 +22,14 @@
       "import": "./dist/runtime.js"
     },
     "./inspector-loader": "./loader.cjs",
+    "./append-loader": "./append-loader.cjs",
     "./inspector-runtime": "./inspector-runtime/index.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist", "loader.cjs", "inspector-runtime"],
+  "files": ["dist", "loader.cjs", "append-loader.cjs", "inspector-runtime"],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",

@@ -27,7 +27,13 @@ export {
   type ImageMeta,
 } from './rpc/assets'
 export { type ModuleInfo } from './rpc/graph'
-export { combineChannels, setupDevtoolsRpc } from './server'
+export {
+  combineChannels,
+  createDevtoolsServer,
+  type DevtoolsServer,
+  type DevtoolsServerOptions,
+  setupDevtoolsRpc,
+} from './server'
 export { createSseTransport, type SseTransport } from './transport/sse'
 export {
   createFakeViteServer,

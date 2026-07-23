@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test && playwright test -c playwright.rspack.config.ts",
+    "test:rsbuild": "playwright test",
+    "test:rspack": "playwright test -c playwright.rspack.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
