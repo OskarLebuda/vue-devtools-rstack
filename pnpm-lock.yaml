@@ -94,9 +94,9 @@ importers:
         specifier: ^3.5.0
         version: 3.5.40(typescript@7.0.2)
 
-  packages/rsbuild-plugin:
+  packages/rsbuild:
     dependencies:
-      '@vue-devtools-rspack/core':
+      '@vue-devtools-rstack/core':
         specifier: workspace:*
         version: link:../core
       kolorist:
@@ -119,9 +119,9 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/rspack-plugin:
+  packages/rspack:
     dependencies:
-      '@vue-devtools-rspack/core':
+      '@vue-devtools-rstack/core':
         specifier: workspace:*
         version: link:../core
       kolorist:
@@ -165,9 +165,9 @@ importers:
       '@types/node':
         specifier: ^26.1.1
         version: 26.1.1
-      rsbuild-plugin-vue-devtools:
+      '@vue-devtools-rstack/rsbuild':
         specifier: workspace:*
-        version: link:../../packages/rsbuild-plugin
+        version: link:../../packages/rsbuild
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -193,12 +193,12 @@ importers:
       '@rspack/dev-server':
         specifier: ^2.1.0
         version: 2.1.0(@rspack/core@2.1.5(@swc/helpers@0.5.23))
+      '@vue-devtools-rstack/rspack':
+        specifier: workspace:*
+        version: link:../../packages/rspack
       '@vue/compiler-sfc':
         specifier: ^3.5.40
         version: 3.5.40
-      rspack-plugin-vue-devtools:
-        specifier: workspace:*
-        version: link:../../packages/rspack-plugin
       vue-loader:
         specifier: ^17.4.2
         version: 17.4.2(@vue/compiler-sfc@3.5.40)(vue@3.5.40(typescript@7.0.2))(webpack@5.108.4(esbuild@0.28.1))

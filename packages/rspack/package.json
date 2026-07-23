@@ -1,5 +1,5 @@
 {
-  "name": "rspack-plugin-vue-devtools",
+  "name": "@vue-devtools-rstack/rspack",
   "type": "module",
   "version": "0.1.0",
   "description": "An Rspack plugin for Vue DevTools - feature parity with vite-plugin-vue-devtools",
@@ -9,7 +9,8 @@
     "vue-devtools",
     "rspack",
     "rspack-plugin",
-    "dx"
+    "dx",
+    "rstack"
   ],
   "exports": {
     ".": {
@@ -29,7 +30,7 @@
     "dev": "rslib build --watch"
   },
   "dependencies": {
-    "@vue-devtools-rspack/core": "workspace:*",
+    "@vue-devtools-rstack/core": "workspace:*",
     "kolorist": "^1.8.0"
   },
   "peerDependencies": {

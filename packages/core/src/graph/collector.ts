@@ -4,7 +4,7 @@ import { debounce } from 'perfect-debounce'
 
 /**
  * The subset of Rspack's stats JSON this collector reads. Declared
- * structurally so `@vue-devtools-rspack/core` needs no dependency on
+ * structurally so `@vue-devtools-rstack/core` needs no dependency on
  * `@rspack/core`, and so it tolerates field drift across Rspack versions.
  */
 export interface StatsModuleLike {

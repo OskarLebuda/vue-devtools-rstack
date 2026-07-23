@@ -5,14 +5,14 @@ import type {
   DevtoolsServer,
   GraphCollector,
   VueDevToolsOptions,
-} from '@vue-devtools-rspack/core'
+} from '@vue-devtools-rstack/core'
 import path from 'node:path'
 import process from 'node:process'
 import {
   createDevtoolsServer,
   normalizeBase,
   resolveVueDevToolsOptions,
-} from '@vue-devtools-rspack/core'
+} from '@vue-devtools-rstack/core'
 import { bold, cyan, green } from 'kolorist'
 
 export interface DevtoolsMiddlewareOptions extends VueDevToolsOptions {

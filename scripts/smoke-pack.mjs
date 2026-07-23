@@ -26,7 +26,7 @@ const run = (cmd, args, cwd) =>
 
 function pack() {
   fs.mkdirSync(tarballDir, { recursive: true })
-  const packages = ['packages/core', 'packages/rsbuild-plugin', 'packages/rspack-plugin']
+  const packages = ['packages/core', 'packages/rsbuild', 'packages/rspack']
   return packages.map((pkg) => {
     const out = run('pnpm', ['pack', '--pack-destination', tarballDir], path.join(repoRoot, pkg))
     return out.trim().split('\n').pop()
@@ -44,7 +44,7 @@ function scaffold(tarballs) {
 
   fs.writeFileSync(path.join(appDir, 'rsbuild.config.ts'), `import { defineConfig } from '@rsbuild/core'
 import { pluginVue } from '@rsbuild/plugin-vue'
-import { pluginVueDevTools } from 'rsbuild-plugin-vue-devtools'
+import { pluginVueDevTools } from '@vue-devtools-rstack/rsbuild'
 
 export default defineConfig({
   plugins: [pluginVue(), pluginVueDevTools()],

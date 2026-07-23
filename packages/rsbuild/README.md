@@ -1,17 +1,17 @@
-# rsbuild-plugin-vue-devtools
+# @vue-devtools-rstack/rsbuild
 
 [Vue DevTools](https://devtools.vuejs.org) for [Rsbuild](https://rsbuild.rs) - feature parity with
 `vite-plugin-vue-devtools`.
 
 ```bash
-pnpm add -D rsbuild-plugin-vue-devtools
+pnpm add -D @vue-devtools-rstack/rsbuild
 ```
 
 ```ts
 // rsbuild.config.ts
 import { defineConfig } from '@rsbuild/core'
 import { pluginVue } from '@rsbuild/plugin-vue'
-import { pluginVueDevTools } from 'rsbuild-plugin-vue-devtools'
+import { pluginVueDevTools } from '@vue-devtools-rstack/rsbuild'
 
 export default defineConfig({
   plugins: [pluginVue(), pluginVueDevTools()],

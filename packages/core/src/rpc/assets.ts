@@ -158,12 +158,12 @@ export function createAssetsWatcher(root: string, extraIgnored: string[] = []): 
 
   watcher.on('all', (event, path) => {
     if (process.env.VUE_DEVTOOLS_RSPACK_DEBUG)
-      console.log('[vue-devtools-rspack] watcher', event, path)
+      console.log('[vue-devtools-rstack] watcher', event, path)
     if (event !== 'change')
       debouncedAssetsUpdated()
   })
   watcher.on('error', (err) => {
-    console.error('[vue-devtools-rspack] watcher error', err)
+    console.error('[vue-devtools-rstack] watcher error', err)
   })
 
   return () => {

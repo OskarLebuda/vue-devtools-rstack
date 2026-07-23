@@ -1,13 +1,13 @@
-# rspack-plugin-vue-devtools
+# @vue-devtools-rstack/rspack
 
 [Vue DevTools](https://devtools.vuejs.org) for raw [Rspack](https://rspack.rs) setups - feature
 parity with `vite-plugin-vue-devtools`.
 
-> Using Rsbuild? Prefer [`rsbuild-plugin-vue-devtools`](https://www.npmjs.com/package/rsbuild-plugin-vue-devtools),
+> Using Rsbuild? Prefer [`@vue-devtools-rstack/rsbuild`](https://www.npmjs.com/package/@vue-devtools-rstack/rsbuild),
 > which wires everything up in one line.
 
 ```bash
-pnpm add -D rspack-plugin-vue-devtools
+pnpm add -D @vue-devtools-rstack/rspack
 ```
 
 The integration has two halves: a **compiler plugin** (overlay injection, component-inspector
@@ -17,8 +17,8 @@ open-in-editor). Both must be registered.
 ```js
 // rspack.config.mjs
 import { rspack } from '@rspack/core'
-import { VueDevToolsRspackPlugin } from 'rspack-plugin-vue-devtools'
-import { createDevtoolsMiddlewares, printDevtoolsBanner } from 'rspack-plugin-vue-devtools/middleware'
+import { VueDevToolsRspackPlugin } from '@vue-devtools-rstack/rspack'
+import { createDevtoolsMiddlewares, printDevtoolsBanner } from '@vue-devtools-rstack/rspack/middleware'
 import { VueLoaderPlugin } from 'vue-loader'
 
 const PORT = 3000

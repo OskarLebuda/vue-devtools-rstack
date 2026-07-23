@@ -48,7 +48,7 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - name: Upgrade to the latest Vue DevTools
         run: |
-          pnpm --filter @vue-devtools-rspack/core add \
+          pnpm --filter @vue-devtools-rstack/core add \
             vite-plugin-vue-devtools@latest \
             @vue/devtools-core@latest \
             @vue/devtools-kit@latest \

@@ -1,5 +1,5 @@
 {
-  "name": "rsbuild-plugin-vue-devtools",
+  "name": "@vue-devtools-rstack/rsbuild",
   "type": "module",
   "version": "0.1.0",
   "description": "An Rsbuild plugin for Vue DevTools - feature parity with vite-plugin-vue-devtools",
@@ -10,7 +10,8 @@
     "rsbuild",
     "rsbuild-plugin",
     "rspack",
-    "dx"
+    "dx",
+    "rstack"
   ],
   "exports": {
     ".": {
@@ -26,7 +27,7 @@
     "dev": "rslib build --watch"
   },
   "dependencies": {
-    "@vue-devtools-rspack/core": "workspace:*",
+    "@vue-devtools-rstack/core": "workspace:*",
     "kolorist": "^1.8.0"
   },
   "peerDependencies": {

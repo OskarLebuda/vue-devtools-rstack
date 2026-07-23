@@ -1,3 +1,7 @@
+<picture>
+  <img alt="Rspack Banner" src=".github/assets/banner.png">
+</picture>
+
 # Vue DevTools for Rspack & Rsbuild
 
 [Vue DevTools](https://devtools.vuejs.org) v8 - the floating overlay, component tree with live
@@ -20,14 +24,14 @@ config (`rspack.config.js` with `require()`) still works on those versions thank
 ### Rsbuild
 
 ```bash
-pnpm add -D rsbuild-plugin-vue-devtools
+pnpm add -D @vue-devtools-rstack/rsbuild
 ```
 
 ```ts
 // rsbuild.config.ts
 import { defineConfig } from '@rsbuild/core'
 import { pluginVue } from '@rsbuild/plugin-vue'
-import { pluginVueDevTools } from 'rsbuild-plugin-vue-devtools'
+import { pluginVueDevTools } from '@vue-devtools-rstack/rsbuild'
 
 export default defineConfig({
   plugins: [pluginVue(), pluginVueDevTools()],
@@ -40,13 +44,13 @@ also reachable at `http://localhost:<port>/__devtools__/`.
 ### Raw Rspack
 
 ```bash
-pnpm add -D rspack-plugin-vue-devtools
+pnpm add -D @vue-devtools-rstack/rspack
 ```
 
 ```js
 // rspack.config.mjs
-import { VueDevToolsRspackPlugin } from 'rspack-plugin-vue-devtools'
-import { createDevtoolsMiddlewares, printDevtoolsBanner } from 'rspack-plugin-vue-devtools/middleware'
+import { VueDevToolsRspackPlugin } from '@vue-devtools-rstack/rspack'
+import { createDevtoolsMiddlewares, printDevtoolsBanner } from '@vue-devtools-rstack/rspack/middleware'
 
 const devtools = new VueDevToolsRspackPlugin()
 const devtoolsServer = createDevtoolsMiddlewares({ collector: devtools.collector })
@@ -72,55 +76,9 @@ export default {
 | `launchEditor` | `string` | `process.env.LAUNCH_EDITOR ?? 'code'` | Editor opened by open-in-editor. |
 | `appendTo` | `string \| RegExp` | `''` | Import the overlay from a matching module instead of injecting a `<script>` tag (for apps without an HTML entry). |
 
-`rspack-plugin-vue-devtools` additionally accepts `base` (dev-server base path), and its
+`@vue-devtools-rstack/rspack` additionally accepts `base` (dev-server base path), and its
 `createDevtoolsMiddlewares` accepts `root`, `publicDir`, `distPath` and `collector`.
 
-## Feature parity
-
-| Feature | Status | Covered by |
-| --- | --- | --- |
-| Overlay injection + panel | ✅ | `overlay.spec.ts` |
-| Component tree | ✅ | `overlay.spec.ts` |
-| Live component state editing | ✅ | `components-edit.spec.ts` |
-| Pinia tab (read + live updates) | ✅ | `components-edit.spec.ts` |
-| Router tab | ✅ | `router-timeline.spec.ts` |
-| Timeline | ✅ | `router-timeline.spec.ts` |
-| Assets tab + live refresh | ✅ | `assets-ui.spec.ts`, `assets-graph.spec.ts` |
-| Module graph tab | ✅ | `assets-graph.spec.ts` |
-| Component picker (click-to-source) | ✅ | `inspector.spec.ts` |
-| Open in editor | ✅ | `inspector.spec.ts` |
-| Separate-window client (`/__devtools__/`) | ✅ | `channel-b.spec.ts` |
-| Custom base path | ✅ | `tests-variants/base-path.spec.ts` |
-| Raw Rspack + `@rspack/dev-server` | ✅ | `tests-rspack/parity.spec.ts` |
-| Production build unaffected | ✅ | `prod-safety.spec.ts` |
-| Vite Inspect tab | ➖ | Vite-only (`vite-plugin-inspect`); the module graph tab covers the same ground. |
-
-## How it works
-
-Vue DevTools is barely Vite-specific. Its architecture splits into two channels:
-
-- **Channel A** (`postMessage` / `BroadcastChannel`) carries everything that runs in the page:
-  component tree, state editing, timeline, router, pinia, custom tabs. It needs no dev-server
-  cooperation, so it works under any bundler once the overlay is on the page.
-- **Channel B** talks to the dev server and is used only by the assets and graph tabs. Upstream it
-  rides Vite's HMR WebSocket; the client acquires it by importing `${base}@vite/client` and calling
-  the module's `createHotContext()`.
-
-So this project:
-
-1. Serves the **prebuilt DevTools client SPA and overlay** shipped inside the
-   `vite-plugin-vue-devtools` npm package (pinned exactly - MIT, see `LICENSE`).
-2. Prebundles a self-contained **overlay bootstrap** (a port of upstream's `overlay.js`) and injects
-   it into the HTML - Rspack cannot transform served files on demand, so the bootstrap must carry
-   its own copy of `@vue/devtools-kit`/`-core`.
-3. Serves a small **`@vite/client` shim** backed by our own WebSocket (with an SSE + POST fallback),
-   which is what lets the *unmodified* client SPA talk to an Rspack dev server.
-4. Reimplements the server-side RPC functions - assets (fast-glob + chokidar + image-meta) and the
-   module graph (derived from Rspack compilation stats instead of `vite-plugin-inspect`).
-5. Vendors the `data-v-inspector` template transform as an Rspack pre-loader plus its overlay
-   runtime, and mounts an `/__open-in-editor` endpoint.
-
-See [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for version pinning and the upgrade procedure.
 
 ## Development
 
@@ -136,7 +94,7 @@ pnpm smoke:pack     # pack + install into a throwaway npm app and verify
 ```
 
 The toolchain is Rstack throughout: packages are built with
-[Rslib](https://rslib.rs), linted with [Rslint](https://github.com/web-infra-dev/rslint),
+[Rslib](https://rslib.rs), linted with [Rslint](https://rslint.rs),
 and exercised against both Rsbuild and raw Rspack playgrounds.
 
 Linting is type-aware and covers the packages, the e2e specs and the playgrounds, so it needs the

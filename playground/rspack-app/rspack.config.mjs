@@ -2,8 +2,8 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { rspack } from '@rspack/core'
-import { VueDevToolsRspackPlugin } from 'rspack-plugin-vue-devtools'
-import { createDevtoolsMiddlewares, printDevtoolsBanner } from 'rspack-plugin-vue-devtools/middleware'
+import { VueDevToolsRspackPlugin } from '@vue-devtools-rstack/rspack'
+import { createDevtoolsMiddlewares, printDevtoolsBanner } from '@vue-devtools-rstack/rspack/middleware'
 import { VueLoaderPlugin } from 'vue-loader'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))

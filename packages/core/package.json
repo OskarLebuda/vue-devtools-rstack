@@ -1,5 +1,5 @@
 {
-  "name": "@vue-devtools-rspack/core",
+  "name": "@vue-devtools-rstack/core",
   "type": "module",
   "version": "0.1.0",
   "description": "Shared server-side logic for Vue DevTools integration with Rspack/Rsbuild",
@@ -9,7 +9,8 @@
     "vue-devtools",
     "rspack",
     "rsbuild",
-    "dx"
+    "dx",
+    "rstack"
   ],
   "exports": {
     ".": {

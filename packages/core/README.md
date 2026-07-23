@@ -1,7 +1,7 @@
-# @vue-devtools-rspack/core
+# @vue-devtools-rstack/core
 
-Shared server-side logic behind [`rsbuild-plugin-vue-devtools`](https://www.npmjs.com/package/rsbuild-plugin-vue-devtools)
-and [`rspack-plugin-vue-devtools`](https://www.npmjs.com/package/rspack-plugin-vue-devtools).
+Shared server-side logic behind [`@vue-devtools-rstack/rsbuild`](https://www.npmjs.com/package/@vue-devtools-rstack/rsbuild)
+and [`@vue-devtools-rstack/rspack`](https://www.npmjs.com/package/@vue-devtools-rstack/rspack).
 
 You normally don't depend on this directly - install one of the plugins above.
 

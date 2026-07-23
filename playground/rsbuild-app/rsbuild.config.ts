@@ -1,7 +1,7 @@
 import process from 'node:process'
 import { defineConfig } from '@rsbuild/core'
 import { pluginVue } from '@rsbuild/plugin-vue'
-import { pluginVueDevTools } from 'rsbuild-plugin-vue-devtools'
+import { pluginVueDevTools } from '@vue-devtools-rstack/rsbuild'
 
 // Escape hatches used by the e2e suite to exercise plugin variants.
 const disabled = process.env.VUE_DEVTOOLS_DISABLE === '1'

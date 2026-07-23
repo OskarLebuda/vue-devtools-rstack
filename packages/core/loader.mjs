@@ -15,7 +15,7 @@ export default function inspectorLoader(source) {
     return injectInspectorAttrs(source, this.resourcePath, this.rootContext)
   }
   catch (err) {
-    this.emitWarning?.(new Error(`[vue-devtools-rspack] inspector transform failed: ${err}`))
+    this.emitWarning?.(new Error(`[vue-devtools-rstack] inspector transform failed: ${err}`))
     return source
   }
 }
