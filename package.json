@@ -8,7 +8,7 @@
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" -r run build",
     "dev": "pnpm --filter playground-rsbuild-app run dev",
-    "typecheck": "pnpm -r run typecheck",
+    "typecheck": "pnpm --filter \"./packages/*\" -r run typecheck",
     "test": "pnpm --filter \"./packages/*\" -r run test",
     "e2e": "pnpm --filter e2e run test"
   }
