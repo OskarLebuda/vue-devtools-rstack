@@ -1,0 +1,23 @@
+{
+  "name": "playground-rsbuild-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "pinia": "^4.0.2",
+    "vue": "^3.5.40",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^2.1.7",
+    "@rsbuild/plugin-vue": "^2.0.1",
+    "rsbuild-plugin-vue-devtools": "workspace:*",
+    "typescript": "^5.9.0"
+  }
+}

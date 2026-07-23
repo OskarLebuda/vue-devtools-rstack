@@ -1,0 +1,55 @@
+{
+  "name": "rspack-plugin-vue-devtools",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "An Rspack plugin for Vue DevTools — feature parity with vite-plugin-vue-devtools",
+  "license": "MIT",
+  "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
+  "keywords": ["vue-devtools", "rspack", "rspack-plugin", "dx"],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./middleware": {
+      "import": {
+        "types": "./dist/middleware.d.mts",
+        "default": "./dist/middleware.mjs"
+      },
+      "require": {
+        "types": "./dist/middleware.d.cts",
+        "default": "./dist/middleware.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@vue-devtools-rspack/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@rspack/core": "^1.0.0 || ^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@rspack/core": { "optional": true }
+  },
+  "devDependencies": {
+    "@rspack/core": "^2.1.5",
+    "@types/node": "^24.0.0",
+    "tsdown": "^0.22.13",
+    "typescript": "^5.9.0"
+  }
+}

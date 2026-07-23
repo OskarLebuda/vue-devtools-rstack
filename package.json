@@ -1,0 +1,15 @@
+{
+  "name": "vue-devtools-rspack-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm --filter \"./packages/*\" -r run build",
+    "dev": "pnpm --filter playground-rsbuild-app run dev",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm --filter \"./packages/*\" -r run test",
+    "e2e": "pnpm --filter e2e run test"
+  }
+}

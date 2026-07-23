@@ -1,0 +1,59 @@
+{
+  "name": "@vue-devtools-rspack/core",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Shared server-side logic for Vue DevTools integration with Rspack/Rsbuild",
+  "license": "MIT",
+  "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
+  "keywords": ["vue-devtools", "rspack", "rsbuild", "dx"],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vue/devtools-core": "8.1.5",
+    "@vue/devtools-kit": "8.1.5",
+    "@vue/devtools-shared": "8.1.5",
+    "vite-plugin-vue-devtools": "8.1.5",
+    "chokidar": "^4.0.3",
+    "fast-glob": "^3.3.3",
+    "image-meta": "^0.2.2",
+    "kolorist": "^1.8.0",
+    "launch-editor-middleware": "^2.14.1",
+    "pathe": "^2.0.3",
+    "perfect-debounce": "^2.1.0",
+    "sirv": "^3.0.2",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.18.0",
+    "tsdown": "^0.22.13",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0",
+    "vue": "^3.5.0"
+  }
+}
