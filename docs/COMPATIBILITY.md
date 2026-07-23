@@ -17,6 +17,14 @@ Packages are built with [Rslib](https://rslib.rs) (`rslib.config.ts` per package
 [Rslint](https://github.com/web-infra-dev/rslint) (`rslint.config.mjs` at the root). Declarations
 are bundled via `dts: { bundle: true }`, which needs `@microsoft/api-extractor`.
 
+`pnpm lint` runs Rslint with `--type-check`, so linting and type checking are a single pass -
+there is no separate `tsc` step. `parserOptions.project` lists every tsconfig in the workspace,
+which means the e2e specs and the playgrounds are type-checked too; the previous per-package
+`tsc` script only covered `packages/*`. Type errors are reported with their usual TypeScript
+codes (verified against `tsc` on a seeded `TS2322`). `pnpm build` remains a second line of
+defence: emitting declarations runs the TypeScript compiler over the package sources, so a type
+error there fails the build as well.
+
 Dependencies are kept at their latest releases, with one deliberate exception: the Vue DevTools
 packages are pinned exactly (see above). TypeScript 7 (the native `tsgo` compiler) requires an
 explicit `rootDir` in each package's `tsconfig.json` when emitting declarations, otherwise dts

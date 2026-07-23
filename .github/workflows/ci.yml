@@ -17,9 +17,11 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+      # Build first: typed linting resolves cross-package imports through the
+      # generated declarations in each package's dist/.
       - run: pnpm build
-      - run: pnpm typecheck
+      # Lint and type check in one pass.
+      - run: pnpm lint
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
       - run: pnpm e2e
 

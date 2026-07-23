@@ -23,8 +23,7 @@
   ],
   "scripts": {
     "build": "rslib build",
-    "dev": "rslib build --watch",
-    "typecheck": "tsc -p tsconfig.json"
+    "dev": "rslib build --watch"
   },
   "dependencies": {
     "@vue-devtools-rspack/core": "workspace:*",

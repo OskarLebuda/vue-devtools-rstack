@@ -4,7 +4,6 @@
  * publicDir), the file watcher is our own chokidar instance, and asset
  * importers come from the graph collector instead of Vite's moduleGraph.
  */
-import type { GraphCollector } from '../graph/collector'
 import type { BroadcastEmitter, RpcFunctionCtx } from './types'
 import fsp from 'node:fs/promises'
 import { getViteRpcServer } from '@vue/devtools-kit'

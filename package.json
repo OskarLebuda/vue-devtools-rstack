@@ -8,11 +8,11 @@
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" -r run build",
     "dev": "pnpm --filter playground-rsbuild-app run dev",
-    "typecheck": "pnpm --filter \"./packages/*\" -r run typecheck",
+    "typecheck": "rslint --type-check-only",
     "e2e": "pnpm --filter e2e run test",
     "smoke:pack": "node scripts/smoke-pack.mjs",
-    "lint": "rslint",
-    "lint:fix": "rslint --fix"
+    "lint": "rslint --type-check",
+    "lint:fix": "rslint --fix --type-check"
   },
   "devDependencies": {
     "@rslint/core": "^0.7.1",

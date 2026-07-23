@@ -13,4 +13,17 @@ export default defineConfig([
   ]),
   js.configs.recommended,
   ts.configs.recommended,
+  {
+    languageOptions: {
+      parserOptions: {
+        // Typed linting + `--type-check`: every TypeScript project in the
+        // workspace, so `pnpm lint` is also the type check.
+        project: [
+          './packages/*/tsconfig.json',
+          './e2e/tsconfig.json',
+          './playground/*/tsconfig.json',
+        ],
+      },
+    },
+  },
 ])
