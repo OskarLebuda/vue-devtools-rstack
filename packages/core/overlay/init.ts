@@ -69,8 +69,8 @@ export function initVueDevTools(options: InitOptions): void {
   }
   script.type = 'module'
 
-  head.appendChild(link)
-  body.appendChild(script)
+  head!.appendChild(link)
+  body!.appendChild(script)
 
   // Used by the browser extension to discover the embedded client.
   win.__VUE_DEVTOOLS_VITE_PLUGIN_CLIENT_URL__ = devtoolsClientUrl

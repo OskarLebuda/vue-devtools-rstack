@@ -13,7 +13,19 @@ export {
   resolveVueDevToolsOptions,
   type VueDevToolsOptions,
 } from './options'
+export {
+  type AssetImporter,
+  type CollectedModule,
+  GraphCollector,
+} from './graph/collector'
 export { getRpcFunctions, type RpcFunctionCtx } from './rpc'
+export {
+  type AssetInfo,
+  type AssetType,
+  createAssetsWatcher,
+  type ImageMeta,
+} from './rpc/assets'
+export { type ModuleInfo } from './rpc/graph'
 export { combineChannels, setupDevtoolsRpc } from './server'
 export { createSseTransport, type SseTransport } from './transport/sse'
 export {

@@ -3,14 +3,11 @@
  * channel. Mirrors upstream vuejs/devtools packages/vite/src/rpc/index.ts —
  * the function names and shapes are the client's API contract.
  */
-export interface RpcFunctionCtx {
-  /** Project root (absolute). */
-  root: string
-  /** Dev-server base path, normalized. */
-  base: string
-  /** Absolute public dir, or '' when disabled. */
-  publicDir: string
-}
+import type { RpcFunctionCtx } from './types'
+import { getAssetsFunctions } from './assets'
+import { getGraphFunctions } from './graph'
+
+export type { RpcFunctionCtx } from './types'
 
 export function getRpcFunctions(ctx: RpcFunctionCtx): Record<string, (...args: any[]) => any> {
   return {
@@ -20,5 +17,7 @@ export function getRpcFunctions(ctx: RpcFunctionCtx): Record<string, (...args: a
     getRoot() {
       return ctx.root
     },
+    ...getAssetsFunctions(ctx),
+    ...getGraphFunctions(ctx),
   }
 }

@@ -2,6 +2,7 @@ import type { RsbuildPlugin } from '@rsbuild/core'
 import type { VueDevToolsOptions } from '@vue-devtools-rspack/core'
 import {
   combineChannels,
+  createAssetsWatcher,
   createClientMiddleware,
   createOpenInEditorMiddleware,
   createOverlayAssetsMiddleware,
@@ -9,11 +10,13 @@ import {
   createViteClientShimMiddleware,
   createWsTransport,
   getBootstrapScriptTag,
+  GraphCollector,
   normalizeBase,
   resolveDevtoolsDirs,
   resolveVueDevToolsOptions,
   setupDevtoolsRpc,
 } from '@vue-devtools-rspack/core'
+import { isAbsolute, join } from 'node:path'
 import { bold, cyan, green } from 'kolorist'
 
 export type { VueDevToolsOptions }
@@ -31,15 +34,33 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
       api.modifyHTMLTags(({ headTags, bodyTags }) => {
         if (!isDev() || resolved.appendTo)
           return { headTags, bodyTags }
-        headTags.unshift({
-          ...getBootstrapScriptTag(getBase(), resolved),
-          head: true,
-          append: false,
-        })
+        headTags.unshift(getBootstrapScriptTag(getBase(), resolved))
         return { headTags, bodyTags }
       })
 
       const closers: (() => void)[] = []
+      const collector = new GraphCollector()
+
+      api.onAfterDevCompile(({ stats }) => {
+        collector.handleStatsJson(
+          stats.toJson({
+            all: false,
+            modules: true,
+            reasons: true,
+            ids: true,
+            cachedModules: true,
+          }),
+        )
+      })
+
+      const resolvePublicDir = (): string => {
+        const publicDir = api.getNormalizedConfig().server.publicDir
+        if (!publicDir)
+          return ''
+        const first = Array.isArray(publicDir) ? publicDir[0] : publicDir
+        const name = (first && typeof first === 'object' ? first.name : undefined) ?? 'public'
+        return isAbsolute(name) ? name : join(api.context.rootPath, name)
+      }
 
       api.onBeforeStartDevServer(({ server }) => {
         const base = getBase()
@@ -78,8 +99,13 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         setupDevtoolsRpc(combineChannels(ws.channel, sse.channel), {
           root: api.context.rootPath,
           base,
-          publicDir: '',
+          publicDir: resolvePublicDir(),
+          collector,
         })
+
+        closers.push(
+          createAssetsWatcher(api.context.rootPath, [api.context.distPath]),
+        )
       })
 
       api.onCloseDevServer(() => {
