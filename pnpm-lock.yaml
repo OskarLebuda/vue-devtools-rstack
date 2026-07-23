@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      playwright-core:
+        specifier: ^1.61.1
+        version: 1.61.1
 
   e2e:
     devDependencies:

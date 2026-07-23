@@ -5,7 +5,12 @@
   "description": "Shared server-side logic for Vue DevTools integration with Rspack/Rsbuild",
   "license": "MIT",
   "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
-  "keywords": ["vue-devtools", "rspack", "rsbuild", "dx"],
+  "keywords": [
+    "vue-devtools",
+    "rspack",
+    "rsbuild",
+    "dx"
+  ],
   "exports": {
     ".": {
       "import": {
@@ -29,7 +34,12 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist", "loader.cjs", "append-loader.cjs", "inspector-runtime"],
+  "files": [
+    "dist",
+    "loader.cjs",
+    "append-loader.cjs",
+    "inspector-runtime"
+  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -63,5 +73,9 @@
     "typescript": "^5.9.0",
     "vitest": "^3.2.0",
     "vue": "^3.5.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

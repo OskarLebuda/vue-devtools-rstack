@@ -5,7 +5,13 @@
   "description": "An Rsbuild plugin for Vue DevTools — feature parity with vite-plugin-vue-devtools",
   "license": "MIT",
   "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
-  "keywords": ["vue-devtools", "rsbuild", "rsbuild-plugin", "rspack", "dx"],
+  "keywords": [
+    "vue-devtools",
+    "rsbuild",
+    "rsbuild-plugin",
+    "rspack",
+    "dx"
+  ],
   "exports": {
     ".": {
       "import": {
@@ -21,7 +27,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -39,5 +47,9 @@
     "@types/node": "^24.0.0",
     "tsdown": "^0.22.13",
     "typescript": "^5.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

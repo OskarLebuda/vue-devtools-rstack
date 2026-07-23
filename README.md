@@ -124,6 +124,7 @@ pnpm build          # build all packages
 pnpm dev            # rsbuild playground on :3333
 pnpm --filter playground-rspack-app dev   # raw rspack playground on :3344
 pnpm e2e            # full Playwright suite (all three legs)
+pnpm smoke:pack     # pack + install into a throwaway npm app and verify
 ```
 
 ## Credits & license

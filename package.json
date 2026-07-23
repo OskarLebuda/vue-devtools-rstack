@@ -10,6 +10,10 @@
     "dev": "pnpm --filter playground-rsbuild-app run dev",
     "typecheck": "pnpm --filter \"./packages/*\" -r run typecheck",
     "test": "pnpm --filter \"./packages/*\" -r run test",
-    "e2e": "pnpm --filter e2e run test"
+    "e2e": "pnpm --filter e2e run test",
+    "smoke:pack": "node scripts/smoke-pack.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.61.1"
   }
 }
