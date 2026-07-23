@@ -4,7 +4,7 @@
 
 | This project | Vue DevTools upstream | Notes |
 | --- | --- | --- |
-| 0.1.x | `vite-plugin-vue-devtools@8.1.5`, `@vue/devtools-{core,kit,shared}@8.1.5` | Verified against Rsbuild 2.1.x, Rspack 2.1.x, `@rspack/dev-server` 2.1.x, Vue 3.5, vue-router 5, pinia 4. |
+| 0.1.x | `vite-plugin-vue-devtools@8.1.5`, `@vue/devtools-{core,kit,shared}@8.1.5` | Verified against Rsbuild 2.1.x, Rspack 2.1.x, `@rspack/dev-server` 2.1.x, Vue 3.5, vue-router 5, pinia 4, TypeScript 7. |
 
 `vite-plugin-vue-devtools` is pinned **exactly**. It is not used as a plugin - it is the donor of
 the prebuilt client SPA (`client/`) and overlay bundle (`overlay/devtools-overlay.mjs` + `.css`),
@@ -16,6 +16,13 @@ overlay bootstrap.
 Packages are built with [Rslib](https://rslib.rs) (`rslib.config.ts` per package) and linted with
 [Rslint](https://github.com/web-infra-dev/rslint) (`rslint.config.mjs` at the root). Declarations
 are bundled via `dts: { bundle: true }`, which needs `@microsoft/api-extractor`.
+
+Dependencies are kept at their latest releases, with one deliberate exception: the Vue DevTools
+packages are pinned exactly (see above). TypeScript 7 (the native `tsgo` compiler) requires an
+explicit `rootDir` in each package's `tsconfig.json` when emitting declarations, otherwise dts
+generation fails with `TS5011`. `@microsoft/api-extractor` still peers on TypeScript 5, so a 5.x
+copy appears transitively in the lockfile - that is its own compiler-API dependency and does not
+affect what our packages are checked or built with.
 
 One Rslib quirk is worth knowing about: it deliberately leaves `process.env.NODE_ENV` for the
 consumer's bundler, and neither `source.define` nor `optimization.nodeEnv` reaches the bundled

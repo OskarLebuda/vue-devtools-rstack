@@ -1,7 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "rootDir": "."
   },
-  "include": ["src", "overlay", "runtime"]
+  "include": [
+    "src",
+    "overlay",
+    "runtime"
+  ]
 }

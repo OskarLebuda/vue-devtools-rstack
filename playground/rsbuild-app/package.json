@@ -18,6 +18,6 @@
     "@rsbuild/core": "^2.1.7",
     "@rsbuild/plugin-vue": "^2.0.1",
     "rsbuild-plugin-vue-devtools": "workspace:*",
-    "typescript": "^5.9.0"
+    "typescript": "^7.0.2"
   }
 }
