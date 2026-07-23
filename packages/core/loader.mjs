@@ -4,7 +4,7 @@
  * vue-loader splits it. Idempotent - the transform skips elements that
  * already carry data-v-inspector.
  */
-import { injectInspectorAttrs } from './dist/index.mjs'
+import { injectInspectorAttrs } from './dist/index.js'
 
 export default function inspectorLoader(source) {
   if (typeof source !== 'string')

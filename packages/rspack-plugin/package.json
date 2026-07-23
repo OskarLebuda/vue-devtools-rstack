@@ -13,20 +13,20 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./middleware": {
-      "types": "./dist/middleware.d.mts",
-      "default": "./dist/middleware.mjs"
+      "types": "./dist/middleware.d.ts",
+      "default": "./dist/middleware.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "rslib build",
+    "dev": "rslib build --watch",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
@@ -42,17 +42,18 @@
     }
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.58.12",
+    "@rslib/core": "^0.23.2",
     "@rspack/core": "^2.1.5",
     "@types/node": "^24.0.0",
-    "tsdown": "^0.22.13",
     "typescript": "^5.9.0"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "engines": {
     "node": ">=20.19"
   }

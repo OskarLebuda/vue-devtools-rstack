@@ -13,8 +13,8 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./runtime": {
       "types": "./dist/runtime.d.ts",
@@ -32,8 +32,8 @@
     "inspector-runtime"
   ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "rslib build",
+    "dev": "rslib build --watch",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
   },
@@ -42,25 +42,26 @@
   },
   "dependencies": {
     "@vue/compiler-dom": "^3.5.0",
-    "magic-string": "^0.30.0",
     "@vue/devtools-core": "8.1.5",
     "@vue/devtools-kit": "8.1.5",
     "@vue/devtools-shared": "8.1.5",
-    "vite-plugin-vue-devtools": "8.1.5",
     "chokidar": "^4.0.3",
     "fast-glob": "^3.3.3",
     "image-meta": "^0.2.2",
     "kolorist": "^1.8.0",
     "launch-editor-middleware": "^2.14.1",
+    "magic-string": "^0.30.0",
     "pathe": "^2.0.3",
     "perfect-debounce": "^2.1.0",
     "sirv": "^3.0.2",
+    "vite-plugin-vue-devtools": "8.1.5",
     "ws": "^8.21.1"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.58.12",
+    "@rslib/core": "^0.23.2",
     "@types/node": "^24.0.0",
     "@types/ws": "^8.18.0",
-    "tsdown": "^0.22.13",
     "typescript": "^5.9.0",
     "vitest": "^3.2.0",
     "vue": "^3.5.0"
@@ -69,8 +70,8 @@
     "access": "public",
     "provenance": true
   },
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "engines": {
     "node": ">=20.19"
   }
