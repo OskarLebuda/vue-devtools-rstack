@@ -1,3 +1,7 @@
+<picture>
+  <img alt="Vue DevTools for Rspack & Rsbuild" src="https://raw.githubusercontent.com/OskarLebuda/vue-devtools-rstack/refs/heads/main/.github/assets/banner.png">
+</picture>
+
 # @vue-devtools-rstack/rspack
 
 [Vue DevTools](https://devtools.vuejs.org) for raw [Rspack](https://rspack.rs) setups - feature

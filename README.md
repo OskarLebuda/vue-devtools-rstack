@@ -1,5 +1,5 @@
 <picture>
-  <img alt="Rspack Banner" src=".github/assets/banner.png">
+  <img alt="Vue DevTools for Rspack & Rsbuild" src="https://raw.githubusercontent.com/OskarLebuda/vue-devtools-rstack/refs/heads/main/.github/assets/banner.png">
 </picture>
 
 # Vue DevTools for Rspack & Rsbuild

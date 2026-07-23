@@ -1,6 +1,7 @@
 {
   "name": "vue-devtools-rstack-monorepo",
   "private": true,
+  "version": "0.1.0",
   "packageManager": "pnpm@10.28.0",
   "type": "module",
   "engines": {
@@ -13,7 +14,8 @@
     "e2e": "pnpm --filter e2e run test",
     "lint": "rslint --type-check",
     "lint:fix": "rslint --fix --type-check",
-    "check:publish": "pnpm --filter \"./packages/*\" -r run check:publish"
+    "check:publish": "pnpm --filter \"./packages/*\" -r run check:publish",
+    "release": "bumpp"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

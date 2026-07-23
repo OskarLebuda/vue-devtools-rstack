@@ -1,3 +1,7 @@
+<picture>
+  <img alt="Vue DevTools for Rspack & Rsbuild" src="https://raw.githubusercontent.com/OskarLebuda/vue-devtools-rstack/refs/heads/main/.github/assets/banner.png">
+</picture>
+
 # @vue-devtools-rstack/core
 
 Shared server-side logic behind [`@vue-devtools-rstack/rsbuild`](https://www.npmjs.com/package/@vue-devtools-rstack/rsbuild)
@@ -13,4 +17,4 @@ It provides:
 - The prebundled overlay bootstrap (`dist/overlay-bootstrap.js`) served into the host page.
 - The vendored component-inspector loader (`./inspector-loader`) and runtime (`./inspector-runtime`).
 
-MIT. See the [project README](https://github.com/olebuda/rspack-vue-devtools#readme).
+MIT. See the [project README](https://github.com/OskarLebuda/vue-devtools-rstack#readme).

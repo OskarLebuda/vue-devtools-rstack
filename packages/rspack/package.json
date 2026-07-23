@@ -4,7 +4,16 @@
   "version": "0.1.0",
   "description": "An Rspack plugin for Vue DevTools - feature parity with vite-plugin-vue-devtools",
   "license": "MIT",
-  "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
+  "author": "Oskar Lebuda",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OskarLebuda/vue-devtools-rstack.git",
+    "directory": "packages/rspack"
+  },
+  "bugs": {
+    "url": "https://github.com/OskarLebuda/vue-devtools-rstack/issues"
+  },
+  "homepage": "https://github.com/OskarLebuda/vue-devtools-rstack#readme",
   "keywords": [
     "vue-devtools",
     "rspack",
