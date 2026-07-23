@@ -18,6 +18,9 @@ import {
 } from '@vue-devtools-rspack/core'
 import { isAbsolute, join } from 'node:path'
 import { bold, cyan, green } from 'kolorist'
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
 
 export type { VueDevToolsOptions }
 
@@ -37,6 +40,46 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         headTags.unshift(getBootstrapScriptTag(getBase(), resolved))
         return { headTags, bodyTags }
       })
+
+      // -- component inspector (click-to-source) ---------------------------
+      if (resolved.componentInspector) {
+        api.modifyRsbuildConfig((config) => {
+          if (api.context.action !== 'dev')
+            return config
+          const runtime = require.resolve('@vue-devtools-rspack/core/inspector-runtime')
+          config.source ??= {}
+          const pre = config.source.preEntry
+          config.source.preEntry = [
+            ...(Array.isArray(pre) ? pre : pre ? [pre] : []),
+            runtime,
+          ]
+          return config
+        })
+
+        api.modifyRspackConfig((config, { rspack }) => {
+          if (!isDev())
+            return
+          const inspectorOptions
+            = typeof resolved.componentInspector === 'object' ? resolved.componentInspector : {}
+          config.module ??= {}
+          config.module.rules ??= []
+          config.module.rules.unshift({
+            test: /\.vue$/,
+            exclude: /node_modules/,
+            enforce: 'pre',
+            use: [{ loader: require.resolve('@vue-devtools-rspack/core/inspector-loader') }],
+          })
+          config.plugins ??= []
+          config.plugins.push(
+            new rspack.DefinePlugin({
+              __VUE_INSPECTOR_OPTIONS__: JSON.stringify({
+                ...inspectorOptions,
+                base: getBase(),
+              }),
+            }),
+          )
+        })
+      }
 
       const closers: (() => void)[] = []
       const collector = new GraphCollector()

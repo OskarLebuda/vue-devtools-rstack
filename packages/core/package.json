@@ -21,19 +21,26 @@
       "types": "./dist/runtime.d.ts",
       "import": "./dist/runtime.js"
     },
+    "./inspector-loader": "./loader.cjs",
+    "./inspector-runtime": "./inspector-runtime/index.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist"],
+  "files": ["dist", "loader.cjs", "inspector-runtime"],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
   },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "dependencies": {
+    "@vue/compiler-dom": "^3.5.0",
+    "magic-string": "^0.30.0",
     "@vue/devtools-core": "8.1.5",
     "@vue/devtools-kit": "8.1.5",
     "@vue/devtools-shared": "8.1.5",

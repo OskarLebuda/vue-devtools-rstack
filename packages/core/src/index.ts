@@ -18,6 +18,7 @@ export {
   type CollectedModule,
   GraphCollector,
 } from './graph/collector'
+export { injectInspectorAttrs } from './inspector/transform'
 export { getRpcFunctions, type RpcFunctionCtx } from './rpc'
 export {
   type AssetInfo,
