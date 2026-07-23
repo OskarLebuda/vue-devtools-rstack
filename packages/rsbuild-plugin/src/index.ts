@@ -1,13 +1,18 @@
 import type { RsbuildPlugin } from '@rsbuild/core'
 import type { VueDevToolsOptions } from '@vue-devtools-rspack/core'
 import {
+  combineChannels,
   createClientMiddleware,
   createOpenInEditorMiddleware,
   createOverlayAssetsMiddleware,
+  createSseTransport,
+  createViteClientShimMiddleware,
+  createWsTransport,
   getBootstrapScriptTag,
   normalizeBase,
   resolveDevtoolsDirs,
   resolveVueDevToolsOptions,
+  setupDevtoolsRpc,
 } from '@vue-devtools-rspack/core'
 import { bold, cyan, green } from 'kolorist'
 
@@ -34,10 +39,14 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         return { headTags, bodyTags }
       })
 
+      const closers: (() => void)[] = []
+
       api.onBeforeStartDevServer(({ server }) => {
         const base = getBase()
         const dirs = resolveDevtoolsDirs()
+        const forceSse = process.env.VUE_DEVTOOLS_RSPACK_FORCE_SSE === '1'
 
+        // -- static serving ------------------------------------------------
         server.middlewares.use(`${base}__devtools__`, createClientMiddleware(dirs.clientDir))
         server.middlewares.use(
           `${base}__vue-devtools__`,
@@ -47,6 +56,35 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
           `${base}__open-in-editor`,
           createOpenInEditorMiddleware(resolved.launchEditor),
         )
+
+        // -- channel B: transports + vite-hot-client shim --------------------
+        const sse = createSseTransport()
+        const ws = createWsTransport(`${base}__vue-devtools-ws__`)
+        closers.push(() => sse.close(), () => ws.close())
+
+        if (!forceSse && server.httpServer) {
+          // Scoped to our pathname; the HMR socket's upgrades are untouched.
+          ws.attach(server.httpServer)
+        }
+        // The shim tries WS first and falls back to SSE by itself; when WS is
+        // unavailable (middlewareMode) or forced off, it goes straight to SSE.
+        server.middlewares.use(
+          `${base}@vite/client`,
+          createViteClientShimMiddleware(base, forceSse || !server.httpServer),
+        )
+        server.middlewares.use(`${base}__vue-devtools-sse__`, sse.streamMiddleware)
+        server.middlewares.use(`${base}__vue-devtools-send__`, sse.sendMiddleware)
+
+        setupDevtoolsRpc(combineChannels(ws.channel, sse.channel), {
+          root: api.context.rootPath,
+          base,
+          publicDir: '',
+        })
+      })
+
+      api.onCloseDevServer(() => {
+        for (const close of closers.splice(0))
+          close()
       })
 
       api.onAfterStartDevServer(({ port }) => {
