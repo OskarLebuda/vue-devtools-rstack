@@ -1,0 +1,4 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@arethetypeswrong/cli/config-schema.json",
+  "profile": "esm-only"
+}

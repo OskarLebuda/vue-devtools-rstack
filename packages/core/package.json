@@ -34,7 +34,8 @@
   ],
   "scripts": {
     "build": "rslib build",
-    "dev": "rslib build --watch"
+    "dev": "rslib build --watch",
+    "check:publish": "publint && attw --pack ."
   },
   "peerDependencies": {
     "vue": "^3.0.0"

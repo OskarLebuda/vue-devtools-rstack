@@ -24,7 +24,8 @@
   ],
   "scripts": {
     "build": "rslib build",
-    "dev": "rslib build --watch"
+    "dev": "rslib build --watch",
+    "check:publish": "publint && attw --pack ."
   },
   "dependencies": {
     "@vue-devtools-rstack/core": "workspace:*",

@@ -25,7 +25,10 @@ jobs:
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
       - run: pnpm e2e
 
-      - run: pnpm smoke:pack
+      # Validates the published manifests: that every path in exports/files
+      # exists in the tarball and that types resolve. The e2e suite cannot see
+      # this - inside the workspace, pnpm resolves through symlinks.
+      - run: pnpm check:publish
 
       - uses: actions/upload-artifact@v4
         if: failure()

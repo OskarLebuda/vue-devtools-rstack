@@ -90,7 +90,7 @@ pnpm typecheck      # rslint, types only
 pnpm dev            # rsbuild playground on :3333
 pnpm --filter playground-rspack-app dev   # raw rspack playground on :3344
 pnpm e2e            # full Playwright suite (all four legs)
-pnpm smoke:pack     # pack + install into a throwaway npm app and verify
+pnpm check:publish  # publint + attw over the packed tarballs
 ```
 
 The toolchain is Rstack throughout: packages are built with

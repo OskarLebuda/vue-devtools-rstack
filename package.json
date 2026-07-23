@@ -11,12 +11,13 @@
     "dev": "pnpm --filter playground-rsbuild-app run dev",
     "typecheck": "rslint --type-check-only",
     "e2e": "pnpm --filter e2e run test",
-    "smoke:pack": "node scripts/smoke-pack.mjs",
     "lint": "rslint --type-check",
-    "lint:fix": "rslint --fix --type-check"
+    "lint:fix": "rslint --fix --type-check",
+    "check:publish": "pnpm --filter \"./packages/*\" -r run check:publish"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@rslint/core": "^0.7.1",
-    "playwright-core": "^1.61.1"
+    "publint": "^0.3.22"
   }
 }
