@@ -5,7 +5,7 @@
  * importers come from the graph collector instead of Vite's moduleGraph.
  */
 import type { GraphCollector } from '../graph/collector'
-import type { RpcFunctionCtx } from './types'
+import type { BroadcastEmitter, RpcFunctionCtx } from './types'
 import fsp from 'node:fs/promises'
 import { getViteRpcServer } from '@vue/devtools-kit'
 import chokidar from 'chokidar'
@@ -145,7 +145,7 @@ export function getAssetsFunctions(ctx: RpcFunctionCtx) {
  */
 export function createAssetsWatcher(root: string, extraIgnored: string[] = []): () => void {
   const debouncedAssetsUpdated = debounce(() => {
-    (getViteRpcServer?.()?.broadcast as any)?.emit('assetsUpdated')
+    (getViteRpcServer?.()?.broadcast as unknown as BroadcastEmitter | undefined)?.emit('assetsUpdated')
   }, 100)
 
   const watcher = chokidar.watch(root, {

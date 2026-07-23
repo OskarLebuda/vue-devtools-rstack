@@ -6,7 +6,7 @@
  */
 export interface DevtoolsHotChannel {
   send: (event: string, payload: unknown) => void
-  on: (event: string, cb: (data: any) => void) => void
+  on: (event: string, cb: (data: unknown) => void) => void
 }
 
 export interface DevtoolsTransport {
@@ -24,10 +24,10 @@ export function createFakeViteServer(channel: DevtoolsHotChannel): FakeViteServe
 
 /** Shared listener registry used by both WS and SSE transports. */
 export function createChannelHub(): {
-  dispatch: (event: string, data: any) => void
+  dispatch: (event: string, data: unknown) => void
   on: DevtoolsHotChannel['on']
 } {
-  const listeners = new Map<string, ((data: any) => void)[]>()
+  const listeners = new Map<string, ((data: unknown) => void)[]>()
   return {
     dispatch(event, data) {
       for (const cb of listeners.get(event) ?? [])

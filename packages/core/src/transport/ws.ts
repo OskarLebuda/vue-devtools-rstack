@@ -1,5 +1,6 @@
 import type { Server as HttpServer } from 'node:http'
 import type { Http2SecureServer } from 'node:http2'
+import type { Duplex } from 'node:stream'
 import type { DevtoolsTransport } from './types'
 import { WebSocket, WebSocketServer } from 'ws'
 import { createChannelHub } from './types'
@@ -45,7 +46,7 @@ export function createWsTransport(wsPath: string): WsTransport {
         const pathname = new URL(req.url ?? '/', 'http://localhost').pathname
         if (pathname !== wsPath)
           return
-        wss.handleUpgrade(req, socket as any, head, (ws) => {
+        wss.handleUpgrade(req, socket as Duplex, head, (ws) => {
           wss.emit('connection', ws, req)
         })
       })

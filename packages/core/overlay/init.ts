@@ -13,6 +13,19 @@ import {
   toggleComponentInspectorEnabled,
 } from '@vue/devtools-kit'
 
+interface TrustedTypePolicy {
+  createScriptURL: (input: string) => string
+}
+
+/** Globals this bootstrap reads or installs on the host page. */
+interface DevtoolsWindow {
+  __VUE_DEVTOOLS_RSPACK_INITIALIZED__?: boolean
+  __VUE_DEVTOOLS_VITE_PLUGIN_CLIENT_URL__?: string
+  trustedTypes?: {
+    createPolicy: (name: string, rules: TrustedTypePolicy) => TrustedTypePolicy
+  }
+}
+
 export interface InitOptions {
   /** Dev-server base path, normalized with leading + trailing slash. */
   base: string
@@ -21,7 +34,7 @@ export interface InitOptions {
 }
 
 export function initVueDevTools(options: InitOptions): void {
-  const win = window as any
+  const win = window as unknown as DevtoolsWindow
   if (win.__VUE_DEVTOOLS_RSPACK_INITIALIZED__)
     return
   win.__VUE_DEVTOOLS_RSPACK_INITIALIZED__ = true

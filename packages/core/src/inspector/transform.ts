@@ -4,9 +4,10 @@
  * `data-v-inspector="file:line:column"` to every element in SFC templates.
  * JSX/TSX support (babel-based upstream) is not ported yet.
  */
+import type { ElementNode, Node } from '@vue/compiler-dom'
 import path from 'node:path'
 import process from 'node:process'
-import { parse as vueParse, transform as vueTransform } from '@vue/compiler-dom'
+import { ElementTypes, NodeTypes, parse as vueParse, transform as vueTransform } from '@vue/compiler-dom'
 import MagicString from 'magic-string'
 
 const EXCLUDE_TAG = ['template', 'script', 'style']
@@ -23,15 +24,18 @@ export function injectInspectorAttrs(code: string, id: string, cwd = process.cwd
   const ast = vueParse(code, { comments: true })
   vueTransform(ast, {
     nodeTransforms: [
-      (node: any) => {
-        if (node.type === 1) {
-          if ((node.tagType === 0 || node.tagType === 1) && !EXCLUDE_TAG.includes(node.tag)) {
-            if (node.loc.source.includes(KEY_DATA))
+      (node: Node) => {
+        if (node.type === NodeTypes.ELEMENT) {
+          const element = node as ElementNode
+          const isTagged
+            = element.tagType === ElementTypes.ELEMENT || element.tagType === ElementTypes.COMPONENT
+          if (isTagged && !EXCLUDE_TAG.includes(element.tag)) {
+            if (element.loc.source.includes(KEY_DATA))
               return
-            const insertPosition = node.props.length
-              ? Math.max(...node.props.map((i: any) => i.loc.end.offset))
-              : node.loc.start.offset + node.tag.length + 1
-            const { line, column } = node.loc.start
+            const insertPosition = element.props.length
+              ? Math.max(...element.props.map(prop => prop.loc.end.offset))
+              : element.loc.start.offset + element.tag.length + 1
+            const { line, column } = element.loc.start
             const content = ` ${KEY_DATA}="${relativePath}:${line}:${column}"`
             s.prependLeft(insertPosition, content)
           }

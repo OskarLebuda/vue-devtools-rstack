@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { viteRpc } from './helpers'
 
 test('client SPA establishes the vite RPC over the shim and heartbeat resolves', async ({ page }) => {
   const failedRequests: string[] = []
@@ -13,19 +14,9 @@ test('client SPA establishes the vite RPC over the shim and heartbeat resolves',
   expect(failedRequests).toEqual([])
 
   // ...and the birpc client over our WebSocket must answer a real RPC call.
-  const heartbeat = await page.evaluate(async () => {
-    const start = Date.now()
-    while (!(window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) {
-      if (Date.now() - start > 10_000)
-        throw new Error('vite rpc client never initialized')
-      await new Promise(r => setTimeout(r, 100))
-    }
-    return (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.heartbeat()
-  })
-  expect(heartbeat).toBe(true)
+  expect(await viteRpc(page, 'heartbeat')).toBe(true)
 
-  const root = await page.evaluate(async () =>
-    (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.getRoot())
+  const root = await viteRpc(page, 'getRoot')
   expect(typeof root).toBe('string')
   expect(root.length).toBeGreaterThan(0)
 })

@@ -11,6 +11,20 @@ the prebuilt client SPA (`client/`) and overlay bundle (`overlay/devtools-overla
 which must stay in lockstep with the `@vue/devtools-kit` protocol version we bundle into the
 overlay bootstrap.
 
+## Toolchain
+
+Packages are built with [Rslib](https://rslib.rs) (`rslib.config.ts` per package) and linted with
+[Rslint](https://github.com/web-infra-dev/rslint) (`rslint.config.mjs` at the root). Declarations
+are bundled via `dts: { bundle: true }`, which needs `@microsoft/api-extractor`.
+
+One Rslib quirk is worth knowing about: it deliberately leaves `process.env.NODE_ENV` for the
+consumer's bundler, and neither `source.define` nor `optimization.nodeEnv` reaches the bundled
+`node_modules` in a library build. The overlay bootstrap is served straight to the browser, where
+`process` does not exist at all, so it threw `ReferenceError: process is not defined` on load. A
+`BannerPlugin` now declares `process` at the emitted module's top level — module-scoped, so
+nothing is added to `globalThis`. See the third `lib` entry in
+`packages/core/rslib.config.ts`.
+
 ## Module format
 
 All packages are **ESM only**; no CommonJS build is produced. Node 20.19+ / 22.12+ is required,

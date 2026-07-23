@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { openDevtoolsPanel } from '../tests/helpers'
+import { enableInspector, openDevtoolsPanel, viteRpc, waitForInspector } from '../tests/helpers'
 
 test('overlay is injected via HtmlRspackPlugin and the panel opens', async ({ page }) => {
   const errors: string[] = []
@@ -17,24 +17,13 @@ test('overlay is injected via HtmlRspackPlugin and the panel opens', async ({ pa
 test('vite RPC channel works over the shim on @rspack/dev-server', async ({ page }) => {
   await page.goto('/__devtools__/')
 
-  const heartbeat = await page.evaluate(async () => {
-    const start = Date.now()
-    while (!(window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) {
-      if (Date.now() - start > 10_000)
-        throw new Error('vite rpc client never initialized')
-      await new Promise(r => setTimeout(r, 100))
-    }
-    return (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.heartbeat()
-  })
-  expect(heartbeat).toBe(true)
+  expect(await viteRpc(page, 'heartbeat')).toBe(true)
 
-  const assets = await page.evaluate(async () =>
-    (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.getStaticAssets())
-  expect(assets.some((a: any) => a.path === 'logo.svg')).toBe(true)
+  const assets = await viteRpc(page, 'getStaticAssets')
+  expect(assets.some(a => a.path === 'logo.svg')).toBe(true)
 
-  const modules = await page.evaluate(async () =>
-    (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.getGraphModules())
-  expect(modules.some((m: any) => m.id.endsWith('/src/App.vue'))).toBe(true)
+  const modules = await viteRpc(page, 'getGraphModules')
+  expect(modules.some(m => m.id.endsWith('/src/App.vue'))).toBe(true)
 })
 
 test('component inspector and open-in-editor work under raw rspack', async ({ page }) => {
@@ -45,7 +34,7 @@ test('component inspector and open-in-editor work under raw rspack', async ({ pa
   })
 
   await page.goto('/')
-  await page.waitForFunction(() => !!(window as any).__VUE_INSPECTOR__)
+  await waitForInspector(page)
 
   const attr = await page
     .locator('[data-v-inspector*="HomePage.vue"]')
@@ -53,14 +42,14 @@ test('component inspector and open-in-editor work under raw rspack', async ({ pa
     .getAttribute('data-v-inspector')
   expect(attr).toMatch(/HomePage\.vue:\d+:\d+$/)
 
-  await page.evaluate(() => (window as any).__VUE_INSPECTOR__.enable())
+  await enableInspector(page)
   const target = page.getByTestId('count')
   await target.hover()
   await page.waitForTimeout(300)
   await target.click()
 
   await expect.poll(() => editorRequests.length).toBeGreaterThan(0)
-  expect(new URL(editorRequests[0]).searchParams.get('file')).toMatch(/HomePage\.vue:\d+:\d+$/)
+  expect(new URL(editorRequests[0]!).searchParams.get('file')).toMatch(/HomePage\.vue:\d+:\d+$/)
 })
 
 test('live state editing round-trips through channel A', async ({ page }) => {

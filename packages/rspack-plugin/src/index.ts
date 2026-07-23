@@ -24,6 +24,30 @@ export interface RspackVueDevToolsOptions extends VueDevToolsOptions {
 
 const PLUGIN_NAME = 'VueDevToolsRspackPlugin'
 
+/** The slice of HtmlRspackPlugin's compilation hooks used for tag injection. */
+interface HtmlAssetTag {
+  tagName: string
+  voidTag: boolean
+  meta: Record<string, unknown>
+  attributes: Record<string, string>
+}
+
+interface AlterAssetTagsData {
+  assetTags: { scripts: HtmlAssetTag[] }
+}
+
+interface HtmlCompilationHooks {
+  alterAssetTags?: {
+    tap: (name: string, fn: (data: AlterAssetTagsData) => AlterAssetTagsData) => void
+  }
+}
+
+interface HtmlPluginLike {
+  HtmlRspackPlugin?: {
+    getCompilationHooks?: (compilation: unknown) => HtmlCompilationHooks
+  }
+}
+
 /**
  * Rspack plugin half of the Vue DevTools integration: injects the overlay
  * bootstrap into the HTML, wires up the component inspector transform, and
@@ -112,7 +136,8 @@ export class VueDevToolsRspackPlugin {
     }
 
     compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-      const hooks = (compiler.rspack as any).HtmlRspackPlugin?.getCompilationHooks?.(compilation)
+      const rspackApi = compiler.rspack as unknown as HtmlPluginLike
+      const hooks = rspackApi.HtmlRspackPlugin?.getCompilationHooks?.(compilation)
       if (!hooks?.alterAssetTags) {
         compilation.warnings.push(
           new compiler.rspack.WebpackError(
@@ -124,7 +149,7 @@ export class VueDevToolsRspackPlugin {
         return
       }
 
-      hooks.alterAssetTags.tap(PLUGIN_NAME, (data: any) => {
+      hooks.alterAssetTags.tap(PLUGIN_NAME, (data) => {
         data.assetTags.scripts.unshift({
           tagName: 'script',
           voidTag: false,

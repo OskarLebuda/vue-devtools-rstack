@@ -2,7 +2,7 @@ import type { Server as HttpServer } from 'node:http'
 import type { Http2SecureServer } from 'node:http2'
 import type { ConnectMiddleware } from './middlewares/client'
 import type { ResolvedVueDevToolsOptions } from './options'
-import type { RpcFunctionCtx } from './rpc'
+import type { RpcFunctionCtx, RpcFunctions } from './rpc'
 import type { DevtoolsHotChannel } from './transport/types'
 import { createViteServerRpc } from '@vue/devtools-core'
 import { setViteServerContext } from '@vue/devtools-kit'
@@ -27,7 +27,7 @@ import { createWsTransport } from './transport/ws'
 export function setupDevtoolsRpc(
   channel: DevtoolsHotChannel,
   ctx: RpcFunctionCtx,
-  extraFunctions: Record<string, (...args: any[]) => any> = {},
+  extraFunctions: RpcFunctions = {},
 ): void {
   setViteServerContext(createFakeViteServer(channel))
   createViteServerRpc({ ...getRpcFunctions(ctx), ...extraFunctions })

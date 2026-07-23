@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { openDevtoolsPanel } from '../tests/helpers'
+import { enableInspector, openDevtoolsPanel, viteRpc } from '../tests/helpers'
 
 const BASE_URL = 'http://localhost:3355/app/'
 
@@ -20,17 +20,7 @@ test('everything is mounted under a non-root server.base', async ({ page }) => {
 
 test('channel B and open-in-editor honour the base path', async ({ page }) => {
   await page.goto(`${BASE_URL}__devtools__/`)
-
-  const heartbeat = await page.evaluate(async () => {
-    const start = Date.now()
-    while (!(window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) {
-      if (Date.now() - start > 15_000)
-        throw new Error('vite rpc client never initialized')
-      await new Promise(r => setTimeout(r, 100))
-    }
-    return (window as any).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.heartbeat()
-  })
-  expect(heartbeat).toBe(true)
+  expect(await viteRpc(page, 'heartbeat')).toBe(true)
 
   const editorRequests: string[] = []
   await page.route('**/__open-in-editor**', async (route) => {
@@ -39,8 +29,7 @@ test('channel B and open-in-editor honour the base path', async ({ page }) => {
   })
 
   await page.goto(BASE_URL)
-  await page.waitForFunction(() => !!(window as any).__VUE_INSPECTOR__)
-  await page.evaluate(() => (window as any).__VUE_INSPECTOR__.enable())
+  await enableInspector(page)
   const target = page.getByTestId('count')
   await target.hover()
   await page.waitForTimeout(300)

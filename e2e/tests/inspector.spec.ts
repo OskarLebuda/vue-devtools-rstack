@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { enableInspector, waitForInspector } from './helpers'
 
 test('inspector runtime loads and SFC templates carry source locations', async ({ page }) => {
   await page.goto('/')
 
   // The vendored runtime mounts and registers the global inspector API.
-  await page.waitForFunction(() => !!(window as any).__VUE_INSPECTOR__)
+  await waitForInspector(page)
 
   // The pre-loader added data-v-inspector="file:line:col" to template elements.
   const attr = await page
@@ -22,9 +23,7 @@ test('picking an element requests open-in-editor with file, line and column', as
   })
 
   await page.goto('/')
-  await page.waitForFunction(() => !!(window as any).__VUE_INSPECTOR__)
-
-  await page.evaluate(() => (window as any).__VUE_INSPECTOR__.enable())
+  await enableInspector(page)
 
   // Hover an app element so the overlay picks up its source location, then click.
   const target = page.getByTestId('count')
@@ -33,9 +32,8 @@ test('picking an element requests open-in-editor with file, line and column', as
   await target.click()
 
   await expect.poll(() => editorRequests.length).toBeGreaterThan(0)
-  const url = new URL(editorRequests[0])
-  const file = url.searchParams.get('file')
-  expect(file).toMatch(/HomePage\.vue:\d+:\d+$/)
+  const url = new URL(editorRequests[0]!)
+  expect(url.searchParams.get('file')).toMatch(/HomePage\.vue:\d+:\d+$/)
 })
 
 test('open-in-editor endpoint is served by the dev server', async ({ request }) => {

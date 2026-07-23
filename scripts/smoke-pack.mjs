@@ -156,7 +156,9 @@ try {
       if (res.ok)
         break
     }
-    catch {}
+    catch {
+      // server not up yet
+    }
     if (Date.now() > deadline)
       throw new Error('smoke app dev server never started')
     await new Promise(r => setTimeout(r, 500))
@@ -171,6 +173,8 @@ finally {
   try {
     process.kill(-server.pid)
   }
-  catch {}
+  catch {
+    // already exited
+  }
   fs.rmSync(workDir, { recursive: true, force: true })
 }

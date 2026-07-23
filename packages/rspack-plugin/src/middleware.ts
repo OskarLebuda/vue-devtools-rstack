@@ -1,6 +1,7 @@
 import type { Server as HttpServer } from 'node:http'
 import type { Http2SecureServer } from 'node:http2'
 import type {
+  ConnectMiddleware,
   DevtoolsServer,
   GraphCollector,
   VueDevToolsOptions,
@@ -32,7 +33,7 @@ export interface DevtoolsMiddlewareOptions extends VueDevToolsOptions {
 
 export interface DevtoolsMiddlewareSetup {
   /** Middleware entries for `devServer.setupMiddlewares`. */
-  middlewares: { name: string, path: string, middleware: any }[]
+  middlewares: { name: string, path: string, middleware: ConnectMiddleware }[]
   /** Call from `devServer.options.onListening` to enable the WebSocket. */
   attach: (httpServer: HttpServer | Http2SecureServer | null | undefined) => void
   close: () => void

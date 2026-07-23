@@ -1,5 +1,27 @@
+import type { BroadcastEmitter } from '../rpc/types'
 import { getViteRpcServer } from '@vue/devtools-kit'
 import { debounce } from 'perfect-debounce'
+
+/**
+ * The subset of Rspack's stats JSON this collector reads. Declared
+ * structurally so `@vue-devtools-rspack/core` needs no dependency on
+ * `@rspack/core`, and so it tolerates field drift across Rspack versions.
+ */
+export interface StatsModuleLike {
+  identifier?: string
+  nameForCondition?: string | null
+  moduleType?: string
+  reasons?: {
+    moduleIdentifier?: string | null
+    resolvedModuleIdentifier?: string | null
+  }[]
+  modules?: StatsModuleLike[]
+}
+
+export interface StatsJsonLike {
+  children?: StatsJsonLike[]
+  modules?: StatsModuleLike[]
+}
 
 export interface CollectedModule {
   id: string
@@ -23,12 +45,12 @@ export class GraphCollector {
   private modules = new Map<string, Set<string>>()
 
   private debouncedModuleUpdated = debounce(() => {
-    (getViteRpcServer?.()?.broadcast as any)?.emit('graphModuleUpdated')
+    (getViteRpcServer?.()?.broadcast as unknown as BroadcastEmitter | undefined)?.emit('graphModuleUpdated')
   }, 100)
 
   /** Accepts the result of stats.toJson({ modules: true, reasons: true }). */
-  handleStatsJson(statsJson: any): void {
-    const statsList: any[] = Array.isArray(statsJson?.children) && statsJson.children.length
+  handleStatsJson(statsJson: StatsJsonLike): void {
+    const statsList: StatsJsonLike[] = statsJson?.children?.length
       ? statsJson.children
       : [statsJson]
 
@@ -91,7 +113,7 @@ export class GraphCollector {
 }
 
 /** Absolute resource path of a stats module, or null for runtime/virtual ones. */
-function moduleResource(module: any): string | null {
+function moduleResource(module: StatsModuleLike): string | null {
   const viaName = typeof module.nameForCondition === 'string' ? module.nameForCondition : null
   const resource = viaName ?? identifierToResource(module.identifier)
   if (!resource)

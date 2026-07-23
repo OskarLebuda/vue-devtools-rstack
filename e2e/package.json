@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "pnpm run test:rsbuild && pnpm run test:rspack && pnpm run test:variants",
+    "test": "pnpm run test:rsbuild && pnpm run test:rspack && pnpm run test:variants && pnpm run test:build",
     "test:rsbuild": "playwright test",
     "test:rspack": "playwright test -c playwright.rspack.config.ts",
-    "test:variants": "playwright test -c playwright.variants.config.ts"
+    "test:variants": "playwright test -c playwright.variants.config.ts",
+    "test:build": "playwright test -c playwright.build.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

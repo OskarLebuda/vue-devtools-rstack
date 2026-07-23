@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
+import { waitForInspector } from './helpers'
 
 test('devtools panel shows the component-inspector button and it toggles the picker', async ({ page }) => {
   await page.goto('/')
-  await page.waitForFunction(() => !!(window as any).__VUE_INSPECTOR__)
+  await waitForInspector(page)
 
   const container = page.locator('#__vue-devtools-container__')
   await expect(container).toBeAttached()
@@ -14,11 +15,11 @@ test('devtools panel shows the component-inspector button and it toggles the pic
 
   await inspectorButton.click({ force: true })
   await expect
-    .poll(() => page.evaluate(() => (window as any).__VUE_INSPECTOR__.enabled))
+    .poll(() => page.evaluate(() => window.__VUE_INSPECTOR__!.enabled))
     .toBe(true)
 
   await page.keyboard.press('Escape')
   await expect
-    .poll(() => page.evaluate(() => (window as any).__VUE_INSPECTOR__.enabled))
+    .poll(() => page.evaluate(() => window.__VUE_INSPECTOR__!.enabled))
     .toBe(false)
 })

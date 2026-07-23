@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@rslint/core':
+        specifier: ^0.7.1
+        version: 0.7.1
       playwright-core:
         specifier: ^1.61.1
         version: 1.61.1
@@ -895,6 +898,55 @@ packages:
       typescript:
         optional: true
 
+  '@rslint/core@0.7.1':
+    resolution: {integrity: sha512-FOeueVzYCNIJO/R+Wf75ZS8LljZlzZHlesJsghBxkteoNpuuKCXcFGibNiUv1XKB6hknJpznt+shGyTSYSWLVA==}
+    hasBin: true
+    peerDependencies:
+      jiti: ^2.0.0
+    peerDependenciesMeta:
+      jiti:
+        optional: true
+
+  '@rslint/native-darwin-arm64@0.7.1':
+    resolution: {integrity: sha512-+jW0+xxMOaDXcfVuqjRr11dYZXsHZwKeYtn7ZIrY05S6Jwny6cvtsU1P2Jm02jhRost+K7/v7kGKqEFqGFYpKw==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@rslint/native-darwin-x64@0.7.1':
+    resolution: {integrity: sha512-rg+C73OUO9J9KAh5qpGDv8hzC0uZ8f0OBtc7Qoo9C7Ka1CHcrn23tCDls6oKIiRrzlwi80JlMu310LL0UpsRQQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@rslint/native-linux-arm64-gnu@0.7.1':
+    resolution: {integrity: sha512-8qL0pG4XPLm0/iSUFUWScJuS4nrmIHtXVWwKct/bA1S+0izqR4GwP+2lxEBgvciW2JrxbRE8V3vqd6ZmAqlG4w==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rslint/native-linux-arm64-musl@0.7.1':
+    resolution: {integrity: sha512-MANHcVzdtOt8LR9gAwLwWVgfetO5DgH47spRiaUnJ07gewoRkHomm4NHiCOIiLht+F6XkzhHwsN8VItvsEABMw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rslint/native-linux-x64-gnu@0.7.1':
+    resolution: {integrity: sha512-CKUKk5hmHObR93bGFheMkVBLxBVOtMoo7nc1x06rZESRtKw5vKHyMUieHg+8AAaJGEhxHMIMhrQTCDOZ4DUR7g==}
+    cpu: [x64]
+    os: [linux]
+
+  '@rslint/native-linux-x64-musl@0.7.1':
+    resolution: {integrity: sha512-gqytinzowpPC1bTRN2eUw7HxHcIT+X2HYgnlxxchrjINmseoa8yt46QQWn7OPMwNKWKSoLk2BHvuw0fhPo4m/Q==}
+    cpu: [x64]
+    os: [linux]
+
+  '@rslint/native-win32-arm64-msvc@0.7.1':
+    resolution: {integrity: sha512-zRryqKmmmWCUWX4iaOetQC0yycWSNSIXB6YqMR+T56clv3VXvLrM2TQsGiQbwxLAzGjNmRBp+rYEUt2NyEeaYA==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@rslint/native-win32-x64-msvc@0.7.1':
+    resolution: {integrity: sha512-/mwDeo742sE/bzdWhWp/2TQELSUf4UoWJqHNT7zmejiZQCLSz9aXU742JfWVOKipNUWNoB8THvpCLDfav7RJYg==}
+    cpu: [x64]
+    os: [win32]
+
   '@rspack/binding-darwin-arm64@2.1.5':
     resolution: {integrity: sha512-XLAN6YSU36qkciJtV9DY9z57pdHOjKy/f1HyoqpZenRg8p46jnXPziV45lfrTZpG+FF6g/jtTUc4dKbeyoWqPw==}
     cpu: [arm64]
@@ -1747,6 +1799,10 @@ packages:
   picomatch@2.3.2:
     resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
     engines: {node: '>=8.6'}
+
+  picomatch@4.0.4:
+    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
+    engines: {node: '>=12'}
 
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
@@ -2809,6 +2865,43 @@ snapshots:
       - '@typescript/native-preview'
       - core-js
 
+  '@rslint/core@0.7.1':
+    dependencies:
+      picomatch: 4.0.4
+    optionalDependencies:
+      '@rslint/native-darwin-arm64': 0.7.1
+      '@rslint/native-darwin-x64': 0.7.1
+      '@rslint/native-linux-arm64-gnu': 0.7.1
+      '@rslint/native-linux-arm64-musl': 0.7.1
+      '@rslint/native-linux-x64-gnu': 0.7.1
+      '@rslint/native-linux-x64-musl': 0.7.1
+      '@rslint/native-win32-arm64-msvc': 0.7.1
+      '@rslint/native-win32-x64-msvc': 0.7.1
+
+  '@rslint/native-darwin-arm64@0.7.1':
+    optional: true
+
+  '@rslint/native-darwin-x64@0.7.1':
+    optional: true
+
+  '@rslint/native-linux-arm64-gnu@0.7.1':
+    optional: true
+
+  '@rslint/native-linux-arm64-musl@0.7.1':
+    optional: true
+
+  '@rslint/native-linux-x64-gnu@0.7.1':
+    optional: true
+
+  '@rslint/native-linux-x64-musl@0.7.1':
+    optional: true
+
+  '@rslint/native-win32-arm64-msvc@0.7.1':
+    optional: true
+
+  '@rslint/native-win32-x64-msvc@0.7.1':
+    optional: true
+
   '@rspack/binding-darwin-arm64@2.1.5':
     optional: true
 
@@ -3628,6 +3721,8 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@2.3.2: {}
+
+  picomatch@4.0.4: {}
 
   picomatch@4.0.5: {}
 

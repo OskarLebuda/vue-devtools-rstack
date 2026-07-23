@@ -1,5 +1,21 @@
 import type { GraphCollector } from '../graph/collector'
 
+/**
+ * A function exposed over the birpc channel. Arguments and results are
+ * SuperJSON-serialized, so the surface is dynamic by nature.
+ */
+export type RpcFunction = (...args: never[]) => unknown
+
+export type RpcFunctions = Record<string, RpcFunction>
+
+/**
+ * `broadcast` on the kit's birpc group return is typed as the (empty) remote
+ * function set; the server-push events we emit live outside that contract.
+ */
+export interface BroadcastEmitter {
+  emit: (event: string, ...args: unknown[]) => void
+}
+
 export interface RpcFunctionCtx {
   /** Project root (absolute). */
   root: string

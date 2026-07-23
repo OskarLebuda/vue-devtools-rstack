@@ -11,9 +11,12 @@
     "typecheck": "pnpm --filter \"./packages/*\" -r run typecheck",
     "test": "pnpm --filter \"./packages/*\" -r run test",
     "e2e": "pnpm --filter e2e run test",
-    "smoke:pack": "node scripts/smoke-pack.mjs"
+    "smoke:pack": "node scripts/smoke-pack.mjs",
+    "lint": "rslint",
+    "lint:fix": "rslint --fix"
   },
   "devDependencies": {
+    "@rslint/core": "^0.7.1",
     "playwright-core": "^1.61.1"
   }
 }

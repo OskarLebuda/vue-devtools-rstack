@@ -126,12 +126,18 @@ See [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for version pinning and the
 
 ```bash
 pnpm install
-pnpm build          # build all packages
+pnpm build          # build all packages (rslib)
+pnpm lint           # rslint
+pnpm typecheck
 pnpm dev            # rsbuild playground on :3333
 pnpm --filter playground-rspack-app dev   # raw rspack playground on :3344
-pnpm e2e            # full Playwright suite (all three legs)
+pnpm e2e            # full Playwright suite (all four legs)
 pnpm smoke:pack     # pack + install into a throwaway npm app and verify
 ```
+
+The toolchain is Rstack throughout: packages are built with
+[Rslib](https://rslib.rs), linted with [Rslint](https://github.com/web-infra-dev/rslint),
+and exercised against both Rsbuild and raw Rspack playgrounds.
 
 ## Credits & license
 
