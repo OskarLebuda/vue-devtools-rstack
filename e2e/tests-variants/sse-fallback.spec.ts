@@ -19,7 +19,7 @@ test('channel B works over the SSE + POST fallback transport', async ({ page }) 
   })
   expect(heartbeat).toBe(true)
 
-  // No devtools WebSocket was opened — the shim went straight to SSE.
+  // No devtools WebSocket was opened - the shim went straight to SSE.
   expect(sockets.filter(url => url.includes('__vue-devtools-ws__'))).toEqual([])
 
   // Real RPC payloads flow both ways over SSE/POST.

@@ -11,7 +11,7 @@ export interface WsTransport extends DevtoolsTransport {
 /**
  * Dedicated WebSocket transport for the devtools "vite" RPC channel.
  * Attached to the dev server's HTTP server via the 'upgrade' event, scoped to
- * a single pathname — other upgrades (e.g. the HMR socket) are left untouched.
+ * a single pathname - other upgrades (e.g. the HMR socket) are left untouched.
  */
 export function createWsTransport(wsPath: string): WsTransport {
   const wss = new WebSocketServer({ noServer: true })

@@ -22,8 +22,6 @@ jobs:
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
       - run: pnpm e2e
 
-      # Verifies the published tarballs (files/exports maps) in a fresh npm
-      # install outside the workspace — the in-repo suite can't catch that.
       - run: pnpm smoke:pack
 
       - uses: actions/upload-artifact@v4
@@ -33,7 +31,6 @@ jobs:
           path: e2e/test-results
           retention-days: 7
 
-  # Early warning when a new Vue DevTools release breaks our integration.
   canary:
     runs-on: ubuntu-latest
     continue-on-error: true

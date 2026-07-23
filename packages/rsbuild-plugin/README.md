@@ -1,6 +1,6 @@
 # rsbuild-plugin-vue-devtools
 
-[Vue DevTools](https://devtools.vuejs.org) for [Rsbuild](https://rsbuild.rs) — feature parity with
+[Vue DevTools](https://devtools.vuejs.org) for [Rsbuild](https://rsbuild.rs) - feature parity with
 `vite-plugin-vue-devtools`.
 
 ```bash
@@ -33,7 +33,7 @@ pluginVueDevTools({
   launchEditor: process.env.LAUNCH_EDITOR ?? 'code',
 
   // Import the overlay from a matching module instead of injecting a <script>
-  // tag — for apps without an HTML entry.
+  // tag - for apps without an HTML entry.
   appendTo: '',
 })
 ```

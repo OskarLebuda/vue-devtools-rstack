@@ -1,6 +1,6 @@
 # rspack-plugin-vue-devtools
 
-[Vue DevTools](https://devtools.vuejs.org) for raw [Rspack](https://rspack.rs) setups — feature
+[Vue DevTools](https://devtools.vuejs.org) for raw [Rspack](https://rspack.rs) setups - feature
 parity with `vite-plugin-vue-devtools`.
 
 > Using Rsbuild? Prefer [`rsbuild-plugin-vue-devtools`](https://www.npmjs.com/package/rsbuild-plugin-vue-devtools),

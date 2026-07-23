@@ -2,7 +2,7 @@
  * The duck type @vue/devtools-kit needs from `setViteServerContext`:
  * it only reads `.hot` (or `.ws`) and calls `send(event, payload)` /
  * `on(event, cb)`. Payloads are SuperJSON strings produced/consumed by the
- * kit — the transport must deliver them to `on` handlers verbatim.
+ * kit - the transport must deliver them to `on` handlers verbatim.
  */
 export interface DevtoolsHotChannel {
   send: (event: string, payload: unknown) => void

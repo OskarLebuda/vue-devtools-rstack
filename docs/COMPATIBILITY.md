@@ -6,10 +6,20 @@
 | --- | --- | --- |
 | 0.1.x | `vite-plugin-vue-devtools@8.1.5`, `@vue/devtools-{core,kit,shared}@8.1.5` | Verified against Rsbuild 2.1.x, Rspack 2.1.x, `@rspack/dev-server` 2.1.x, Vue 3.5, vue-router 5, pinia 4. |
 
-`vite-plugin-vue-devtools` is pinned **exactly**. It is not used as a plugin — it is the donor of
+`vite-plugin-vue-devtools` is pinned **exactly**. It is not used as a plugin - it is the donor of
 the prebuilt client SPA (`client/`) and overlay bundle (`overlay/devtools-overlay.mjs` + `.css`),
 which must stay in lockstep with the `@vue/devtools-kit` protocol version we bundle into the
 overlay bootstrap.
+
+## Module format
+
+All packages are **ESM only**; no CommonJS build is produced. Node 20.19+ / 22.12+ is required,
+which is where `require(esm)` is available - so consumers with a CommonJS `rspack.config.js` can
+still `require()` these packages.
+
+This extends to the Rspack loaders (`loader.mjs`, `append-loader.mjs`), which are plain ESM
+modules with a default export - Rspack accepts them, covered by the `tests-rspack` leg. Package
+paths are resolved with `import.meta.resolve` rather than `createRequire`.
 
 ## Verified environment findings
 
@@ -36,7 +46,7 @@ overlay bootstrap.
   `vite-plugin-inspect`'s UI. There is no Rspack equivalent; the module graph tab covers the same
   need.
 - **Component picker is vendored, not delegated.** `unplugin-vue-inspector@3.0.0` turned out to be
-  a thin `createUnplugin` wrapper that only populates the `vite` hook — it has no working
+  a thin `createUnplugin` wrapper that only populates the `vite` hook - it has no working
   webpack/rspack path. We therefore vendor the template transform from
   `vite-plugin-vue-inspector@6.0.0` (`packages/core/src/inspector/transform.ts`) as an
   `enforce: 'pre'` Rspack loader, and its `Overlay.vue` runtime
@@ -55,7 +65,7 @@ overlay bootstrap.
 ## Known behavioral notes
 
 - The assets tab initializes its extension filter once (upstream `watchOnce`). A file added later
-  with an extension that was not present at load time stays hidden until the tab is remounted —
+  with an extension that was not present at load time stays hidden until the tab is remounted -
   identical behavior under Vite.
 
 ## Upgrade procedure

@@ -1,6 +1,6 @@
 import type { Compiler } from '@rspack/core'
 import type { VueDevToolsOptions } from '@vue-devtools-rspack/core'
-import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import {
   getBootstrapUrl,
   GraphCollector,
@@ -8,7 +8,8 @@ import {
   resolveVueDevToolsOptions,
 } from '@vue-devtools-rspack/core'
 
-const require = createRequire(import.meta.url)
+/** Absolute path of a package subpath, resolved from this module. */
+const resolvePath = (specifier: string) => fileURLToPath(import.meta.resolve(specifier))
 
 export type { VueDevToolsOptions }
 
@@ -29,7 +30,7 @@ const PLUGIN_NAME = 'VueDevToolsRspackPlugin'
  * collects the module graph from compilation stats.
  *
  * The dev-server half (static assets, RPC channel, open-in-editor) is mounted
- * separately — see `rspack-plugin-vue-devtools/middleware`.
+ * separately - see `rspack-plugin-vue-devtools/middleware`.
  */
 export class VueDevToolsRspackPlugin {
   /** Shared with the dev-server middlewares so the graph tab has data. */
@@ -76,7 +77,7 @@ export class VueDevToolsRspackPlugin {
       test: /\.vue$/,
       exclude: /node_modules/,
       enforce: 'pre',
-      use: [{ loader: require.resolve('@vue-devtools-rspack/core/inspector-loader') }],
+      use: [{ loader: resolvePath('@vue-devtools-rspack/core/inspector-loader') }],
     })
 
     const { DefinePlugin, EntryPlugin } = compiler.rspack
@@ -85,8 +86,8 @@ export class VueDevToolsRspackPlugin {
     }).apply(compiler)
 
     // The inspector overlay imports `vue`, so it must be compiled into the
-    // app bundle — prepend it as an extra entry module.
-    const runtime = require.resolve('@vue-devtools-rspack/core/inspector-runtime')
+    // app bundle - prepend it as an extra entry module.
+    const runtime = resolvePath('@vue-devtools-rspack/core/inspector-runtime')
     for (const entryName of Object.keys(compiler.options.entry ?? {}))
       new EntryPlugin(compiler.context, runtime, { name: entryName }).apply(compiler)
   }
@@ -103,7 +104,7 @@ export class VueDevToolsRspackPlugin {
           typeof appendTo === 'string' ? resource.endsWith(appendTo) : appendTo.test(resource),
         enforce: 'pre',
         use: [{
-          loader: require.resolve('@vue-devtools-rspack/core/append-loader'),
+          loader: resolvePath('@vue-devtools-rspack/core/append-loader'),
           options: { base: this.base, componentInspector: !!this.options.componentInspector },
         }],
       })
@@ -115,7 +116,7 @@ export class VueDevToolsRspackPlugin {
       if (!hooks?.alterAssetTags) {
         compilation.warnings.push(
           new compiler.rspack.WebpackError(
-            '[vue-devtools-rspack] HtmlRspackPlugin was not detected — the DevTools overlay '
+            '[vue-devtools-rspack] HtmlRspackPlugin was not detected - the DevTools overlay '
             + 'script could not be injected. Use the `appendTo` option instead, or add '
             + 'HtmlRspackPlugin/html-webpack-plugin to your config.',
           ) as never,

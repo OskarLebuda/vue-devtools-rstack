@@ -21,7 +21,7 @@ test('assets tab lists files and live-updates on file creation', async ({ page }
   await expect(frame.locator('body')).toContainText('sample.json')
 
   // assetsUpdated broadcast: create a new file and expect a live refresh.
-  // NOTE: the extension must already exist in the initial asset list — the
+  // NOTE: the extension must already exist in the initial asset list - the
   // client's extension filter is initialized once (upstream watchOnce) and
   // hides later-added unknown extensions (same behavior under Vite).
   const newFile = path.join(publicDir, 'live-added.json')

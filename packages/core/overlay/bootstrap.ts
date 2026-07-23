@@ -1,5 +1,5 @@
 /**
- * Overlay bootstrap entry — prebundled (self-contained ESM) and served by the
+ * Overlay bootstrap entry - prebundled (self-contained ESM) and served by the
  * dev server at `${base}__vue-devtools__/overlay-bootstrap.js`. Options arrive
  * as query params on the script src (module scripts expose them via
  * import.meta.url).

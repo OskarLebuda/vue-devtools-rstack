@@ -1,12 +1,8 @@
 import fs from 'node:fs'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'pathe'
 
-const require = createRequire(import.meta.url)
-
-const _dirname
-  = typeof __dirname !== 'undefined' ? __dirname : dirname(fileURLToPath(import.meta.url))
+const _dirname = dirname(fileURLToPath(import.meta.url))
 
 /** Prebundled overlay bootstrap shipped in this package's dist. */
 export const BOOTSTRAP_FILE = join(_dirname, 'overlay-bootstrap.js')
@@ -21,12 +17,12 @@ export interface DevtoolsDirs {
 /**
  * The DevTools client SPA and overlay UI are private packages upstream, but
  * their prebuilt bundles ship inside the `vite-plugin-vue-devtools` tarball.
- * We consume them from there — pinned exactly, see package.json.
+ * We consume them from there - pinned exactly, see package.json.
  */
 export function resolveDevtoolsDirs(): DevtoolsDirs {
   let pkgDir: string
   try {
-    pkgDir = dirname(require.resolve('vite-plugin-vue-devtools/package.json'))
+    pkgDir = dirname(fileURLToPath(import.meta.resolve('vite-plugin-vue-devtools/package.json')))
   }
   catch {
     throw new Error(
@@ -45,7 +41,7 @@ export function resolveDevtoolsDirs(): DevtoolsDirs {
     throw new Error(
       '[vue-devtools-rspack] The installed `vite-plugin-vue-devtools` package does not contain '
       + 'the expected prebuilt client/overlay assets. This integration is verified against '
-      + 'vite-plugin-vue-devtools@8.1.5 — make sure that exact version is installed.',
+      + 'vite-plugin-vue-devtools@8.1.5 - make sure that exact version is installed.',
     )
   }
 

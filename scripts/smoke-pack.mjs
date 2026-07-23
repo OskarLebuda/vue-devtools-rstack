@@ -2,7 +2,7 @@
  * Packs the publishable packages, installs them into a throwaway app with npm
  * (outside the pnpm workspace), and verifies the DevTools actually come up.
  *
- * This is what catches missing `files` entries and bad `exports` maps — things
+ * This is what catches missing `files` entries and bad `exports` maps - things
  * the in-repo e2e suite cannot see because it resolves through the workspace.
  *
  * Usage: node scripts/smoke-pack.mjs

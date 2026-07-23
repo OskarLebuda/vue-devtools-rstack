@@ -13,31 +13,22 @@
   ],
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     },
     "./runtime": {
       "types": "./dist/runtime.d.ts",
-      "import": "./dist/runtime.js"
+      "default": "./dist/runtime.js"
     },
-    "./inspector-loader": "./loader.cjs",
-    "./append-loader": "./append-loader.cjs",
+    "./inspector-loader": "./loader.mjs",
+    "./append-loader": "./append-loader.mjs",
     "./inspector-runtime": "./inspector-runtime/index.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
   "files": [
     "dist",
-    "loader.cjs",
-    "append-loader.cjs",
+    "loader.mjs",
+    "append-loader.mjs",
     "inspector-runtime"
   ],
   "scripts": {
@@ -77,5 +68,10 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "engines": {
+    "node": ">=20.19"
   }
 }

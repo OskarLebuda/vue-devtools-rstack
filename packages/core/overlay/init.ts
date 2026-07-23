@@ -34,7 +34,7 @@ export function initVueDevTools(options: InitOptions): void {
   const body = document.getElementsByTagName('body')[0]
   const head = document.getElementsByTagName('head')[0]
 
-  // Lights up the vite-gated tabs (assets, graph) in the client SPA — our
+  // Lights up the vite-gated tabs (assets, graph) in the client SPA - our
   // dev server implements the same RPC surface, so they are fully functional.
   setDevToolsEnv({
     vitePluginDetected: true,

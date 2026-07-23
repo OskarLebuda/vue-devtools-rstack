@@ -40,7 +40,7 @@ test('picking an element requests open-in-editor with file, line and column', as
 
 test('open-in-editor endpoint is served by the dev server', async ({ request }) => {
   // Missing `file` param: launch-editor-middleware answers with an error
-  // instead of 404 — proves the middleware is mounted without launching an
+  // instead of 404 - proves the middleware is mounted without launching an
   // actual editor during the test run.
   const res = await request.get('/__open-in-editor')
   expect(res.status()).not.toBe(404)

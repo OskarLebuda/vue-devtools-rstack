@@ -27,7 +27,7 @@ function load() {
   if (window.__VUE_INSPECTOR__)
     return
   createInspectorContainer()
-  // Vue 3 only — the upstream vue 2 branch (`new Vue.default(...)`) is
+  // Vue 3 only - the upstream vue 2 branch (`new Vue.default(...)`) is
   // dropped: rspack's strict ESM linking rejects `Vue.default` on vue 3.
   createApp({
     render: () => h(App),

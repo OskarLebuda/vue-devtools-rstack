@@ -56,7 +56,7 @@ export interface DevtoolsServerOptions {
   collector?: GraphCollector
   /** Registers a connect-style middleware under `path`. */
   use: (path: string, middleware: ConnectMiddleware) => void
-  /** Node HTTP server, when reachable — enables the WebSocket transport. */
+  /** Node HTTP server, when reachable - enables the WebSocket transport. */
   httpServer?: HttpServer | Http2SecureServer | null
   /** Force the SSE transport (used when no upgrade access is available). */
   forceSse?: boolean

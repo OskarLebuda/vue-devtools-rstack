@@ -4,7 +4,7 @@ export default defineConfig([
   // Node library: server-side logic consumed by the rsbuild/rspack plugins.
   {
     entry: { index: 'src/index.ts' },
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     platform: 'node',
     dts: true,
     clean: true,
@@ -19,7 +19,7 @@ export default defineConfig([
     clean: false,
   },
   // Overlay bootstrap: self-contained ESM served statically by the dev server.
-  // Everything (devtools-kit/core/shared, superjson, birpc...) must be inlined —
+  // Everything (devtools-kit/core/shared, superjson, birpc...) must be inlined -
   // the browser cannot resolve bare imports from a plain <script type=module>.
   {
     entry: { 'overlay-bootstrap': 'overlay/bootstrap.ts' },

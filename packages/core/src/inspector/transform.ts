@@ -1,6 +1,6 @@
 /**
  * Vendored from vite-plugin-vue-inspector@6.0.0 src/compiler/template.ts
- * (MIT, © webfansplz), template branch only — adds
+ * (MIT, © webfansplz), template branch only - adds
  * `data-v-inspector="file:line:column"` to every element in SFC templates.
  * JSX/TSX support (babel-based upstream) is not ported yet.
  */

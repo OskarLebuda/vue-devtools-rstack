@@ -2,7 +2,7 @@
   "name": "rspack-plugin-vue-devtools",
   "type": "module",
   "version": "0.1.0",
-  "description": "An Rspack plugin for Vue DevTools — feature parity with vite-plugin-vue-devtools",
+  "description": "An Rspack plugin for Vue DevTools - feature parity with vite-plugin-vue-devtools",
   "license": "MIT",
   "homepage": "https://github.com/olebuda/rspack-vue-devtools#readme",
   "keywords": [
@@ -13,29 +13,14 @@
   ],
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     },
     "./middleware": {
-      "import": {
-        "types": "./dist/middleware.d.mts",
-        "default": "./dist/middleware.mjs"
-      },
-      "require": {
-        "types": "./dist/middleware.d.cts",
-        "default": "./dist/middleware.cjs"
-      }
+      "types": "./dist/middleware.d.mts",
+      "default": "./dist/middleware.mjs"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
@@ -65,5 +50,10 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "engines": {
+    "node": ">=20.19"
   }
 }

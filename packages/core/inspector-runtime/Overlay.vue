@@ -191,7 +191,7 @@ export default {
       const { file, line, column } = params
       this.overlayVisible = false
       // Vendoring change: upstream resolves against import.meta.url, which
-      // rspack compiles to a file:// URL — resolve against the page instead.
+      // rspack compiles to a file:// URL - resolve against the page instead.
       const url = new URL(
         `${base}__open-in-editor?file=${encodeURIComponent(`${file}:${line}:${column}`)}`,
         window.location.href,

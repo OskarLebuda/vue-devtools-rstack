@@ -140,7 +140,7 @@ export function getAssetsFunctions(ctx: RpcFunctionCtx) {
 
 /**
  * Watches the project for asset additions/removals and broadcasts
- * `assetsUpdated` — mirror of upstream assets.ts server.watcher wiring.
+ * `assetsUpdated` - mirror of upstream assets.ts server.watcher wiring.
  * Returns a disposer.
  */
 export function createAssetsWatcher(root: string, extraIgnored: string[] = []): () => void {

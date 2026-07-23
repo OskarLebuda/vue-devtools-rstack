@@ -1,5 +1,5 @@
 /**
- * Inspector options — injected at build time via DefinePlugin
+ * Inspector options - injected at build time via DefinePlugin
  * (`__VUE_INSPECTOR_OPTIONS__`), mirroring vite-plugin-vue-inspector's
  * `virtual:vue-inspector-options` module and its defaults.
  */

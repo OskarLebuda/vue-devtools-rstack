@@ -1,5 +1,5 @@
 /**
- * Runtime entry for `appendTo` / preEntry mode — compiled by the USER's
+ * Runtime entry for `appendTo` / preEntry mode - compiled by the USER's
  * bundler as part of the app graph (the alternative to HTML injection,
  * mirroring upstream's appendTo). Options come from the import query, or
  * from DefinePlugin when the bundler strips the query.

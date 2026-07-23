@@ -1,7 +1,7 @@
 import type { RsbuildPlugin } from '@rsbuild/core'
 import type { DevtoolsServer, VueDevToolsOptions } from '@vue-devtools-rspack/core'
-import { createRequire } from 'node:module'
 import { isAbsolute, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import {
   createDevtoolsServer,
   getBootstrapScriptTag,
@@ -11,7 +11,8 @@ import {
 } from '@vue-devtools-rspack/core'
 import { bold, cyan, green } from 'kolorist'
 
-const require = createRequire(import.meta.url)
+/** Absolute path of a package subpath, resolved from this module. */
+const resolvePath = (specifier: string) => fileURLToPath(import.meta.resolve(specifier))
 
 export type { VueDevToolsOptions }
 
@@ -40,7 +41,7 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
         api.modifyRsbuildConfig((config) => {
           if (!isDev())
             return config
-          const runtime = require.resolve('@vue-devtools-rspack/core/inspector-runtime')
+          const runtime = resolvePath('@vue-devtools-rspack/core/inspector-runtime')
           config.source ??= {}
           const pre = config.source.preEntry
           config.source.preEntry = [
@@ -63,7 +64,7 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
             test: /\.vue$/,
             exclude: /node_modules/,
             enforce: 'pre',
-            use: [{ loader: require.resolve('@vue-devtools-rspack/core/inspector-loader') }],
+            use: [{ loader: resolvePath('@vue-devtools-rspack/core/inspector-loader') }],
           })
           config.plugins ??= []
           config.plugins.push(

@@ -4,9 +4,9 @@ import type { DevtoolsTransport } from './types'
 import { createChannelHub } from './types'
 
 export interface SseTransport extends DevtoolsTransport {
-  /** Handles GET (event-stream) — mount at `${base}__vue-devtools-sse__`. */
+  /** Handles GET (event-stream) - mount at `${base}__vue-devtools-sse__`. */
   streamMiddleware: ConnectMiddleware
-  /** Handles POST (client→server frames) — mount at `${base}__vue-devtools-send__`. */
+  /** Handles POST (client→server frames) - mount at `${base}__vue-devtools-send__`. */
   sendMiddleware: ConnectMiddleware
 }
 

@@ -14,7 +14,7 @@ export interface AssetImporter {
 /**
  * Builds the module list the DevTools graph tab renders, from Rspack stats
  * (replacement for vite-plugin-inspect's metadata used upstream).
- * Ids are absolute file paths — the client strips the project root itself.
+ * Ids are absolute file paths - the client strips the project root itself.
  *
  * Rspack stats give REVERSE edges (module.reasons[] = importers), so forward
  * `deps` are built by inverting: for module M with reason R, M is a dep of R.
@@ -104,7 +104,7 @@ function moduleResource(module: any): string | null {
 function identifierToResource(identifier: unknown): string | null {
   if (typeof identifier !== 'string')
     return null
-  // "<loaders>!<resource>?<query>" — take the part after the last '!',
+  // "<loaders>!<resource>?<query>" - take the part after the last '!',
   // then strip the query (collapses App.vue?vue&type=script into App.vue).
   const afterLoaders = identifier.slice(identifier.lastIndexOf('!') + 1)
   const resource = afterLoaders.split('?')[0] ?? ''

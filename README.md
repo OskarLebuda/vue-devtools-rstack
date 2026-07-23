@@ -1,13 +1,19 @@
 # Vue DevTools for Rspack & Rsbuild
 
-[Vue DevTools](https://devtools.vuejs.org) v8 — the floating overlay, component tree with live
+[Vue DevTools](https://devtools.vuejs.org) v8 - the floating overlay, component tree with live
 state editing, timeline, router & pinia tabs, assets browser, module graph, click-to-source
-component picker and open-in-editor — for projects built with
+component picker and open-in-editor - for projects built with
 [Rspack](https://rspack.rs) and [Rsbuild](https://rsbuild.rs).
 
 Upstream ships Vue DevTools as `vite-plugin-vue-devtools`, leaving Rspack users with only the
 browser extension. This project closes that gap with **feature parity against
-`vite-plugin-vue-devtools@8.1.5`** — without rewriting DevTools.
+`vite-plugin-vue-devtools@8.1.5`** - without rewriting DevTools.
+
+## Requirements
+
+Node 20.19+ or 22.12+. These packages are **ESM only** - no CommonJS build is shipped. A CommonJS
+config (`rspack.config.js` with `require()`) still works on those versions thanks to Node's
+`require(esm)` support.
 
 ## Quick start
 
@@ -28,7 +34,7 @@ export default defineConfig({
 })
 ```
 
-Start the dev server — the DevTools overlay appears in the corner of your app, and the panel is
+Start the dev server - the DevTools overlay appears in the corner of your app, and the panel is
 also reachable at `http://localhost:<port>/__devtools__/`.
 
 ### Raw Rspack
@@ -103,13 +109,13 @@ Vue DevTools is barely Vite-specific. Its architecture splits into two channels:
 So this project:
 
 1. Serves the **prebuilt DevTools client SPA and overlay** shipped inside the
-   `vite-plugin-vue-devtools` npm package (pinned exactly — MIT, see `LICENSE`).
+   `vite-plugin-vue-devtools` npm package (pinned exactly - MIT, see `LICENSE`).
 2. Prebundles a self-contained **overlay bootstrap** (a port of upstream's `overlay.js`) and injects
-   it into the HTML — Rspack cannot transform served files on demand, so the bootstrap must carry
+   it into the HTML - Rspack cannot transform served files on demand, so the bootstrap must carry
    its own copy of `@vue/devtools-kit`/`-core`.
 3. Serves a small **`@vite/client` shim** backed by our own WebSocket (with an SSE + POST fallback),
    which is what lets the *unmodified* client SPA talk to an Rspack dev server.
-4. Reimplements the server-side RPC functions — assets (fast-glob + chokidar + image-meta) and the
+4. Reimplements the server-side RPC functions - assets (fast-glob + chokidar + image-meta) and the
    module graph (derived from Rspack compilation stats instead of `vite-plugin-inspect`).
 5. Vendors the `data-v-inspector` template transform as an Rspack pre-loader plus its overlay
    runtime, and mounts an `/__open-in-editor` endpoint.
@@ -130,6 +136,6 @@ pnpm smoke:pack     # pack + install into a throwaway npm app and verify
 ## Credits & license
 
 MIT. Vue DevTools itself is built by [webfansplz](https://github.com/webfansplz) and the
-[vuejs/devtools](https://github.com/vuejs/devtools) contributors — this project consumes its
+[vuejs/devtools](https://github.com/vuejs/devtools) contributors - this project consumes its
 published packages and prebuilt assets, and ports the thin Vite glue to Rspack. Portions of
 `vite-plugin-vue-inspector` (also MIT) are vendored for the component picker.
