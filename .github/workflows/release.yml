@@ -13,7 +13,5 @@ jobs:
       # npm trusted publishing (OIDC) - no NPM_TOKEN secret needed.
       id-token: write
     with:
-      # 0.1.0 was published manually - trusted publishing cannot bootstrap a
-      # package that does not exist yet. Re-enabled right after this tag.
-      publish: false
+      publish: true
       build: pnpm build
