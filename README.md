@@ -100,6 +100,17 @@ and exercised against both Rsbuild and raw Rspack playgrounds.
 Linting is type-aware and covers the packages, the e2e specs and the playgrounds, so it needs the
 packages built first - cross-package imports resolve through the declarations in `dist/`.
 
+## Releasing
+
+Every package shares one version. Bump locally, and CI does the rest:
+
+```bash
+pnpm release        # bumpp: picks the version, updates all package.json, commits, tags, pushes
+```
+
+Pushing the `v*` tag triggers `.github/workflows/release.yml`, which builds, publishes to npm via
+trusted publishing (OIDC - no token secret) and drafts the GitHub release notes.
+
 ## Credits & license
 
 MIT. Vue DevTools itself is built by [webfansplz](https://github.com/webfansplz) and the

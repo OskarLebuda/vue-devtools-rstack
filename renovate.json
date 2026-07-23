@@ -1,0 +1,64 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["npm", "github-actions"],
+  "rangeStrategy": "replace",
+  "timezone": "Europe/Warsaw",
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 2,
+  "dependencyDashboard": true,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "Vue DevTools packages move in lockstep with the prebuilt client and overlay assets - see docs/COMPATIBILITY.md. Group them so a bump is reviewed as one change.",
+      "matchPackageNames": [
+        "vite-plugin-vue-devtools",
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "@vue/devtools-shared"
+      ],
+      "groupName": "vue devtools (pinned, lockstep)",
+      "labels": ["dependencies", "vue-devtools"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "description": "Rstack toolchain",
+      "matchPackageNames": [
+        "@rsbuild/**",
+        "@rspack/**",
+        "@rslib/**",
+        "@rslint/**"
+      ],
+      "groupName": "rstack toolchain",
+      "labels": ["dependencies", "rstack"]
+    },
+    {
+      "description": "Runtime dependencies - separate majors",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "major runtime dependencies",
+      "labels": ["dependencies", "major"]
+    },
+    {
+      "description": "Runtime dependencies - group minor and patch",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "minor and patch runtime dependencies",
+      "labels": ["dependencies", "minor/patch"]
+    },
+    {
+      "description": "Dev dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev dependencies",
+      "labels": ["dev-dependency"]
+    },
+    {
+      "description": "Lockfile maintenance",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": "lockfile maintenance",
+      "labels": ["lockfile"]
+    }
+  ]
+}

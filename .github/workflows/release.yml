@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    uses: sxzz/workflows/.github/workflows/release.yml@v1
+    permissions:
+      contents: write
+      # npm trusted publishing (OIDC) - no NPM_TOKEN secret needed.
+      id-token: write
+    with:
+      publish: true
+      build: pnpm build
