@@ -8,7 +8,7 @@
   },
   "include": [
     "src",
-    "overlay",
+    "client",
     "runtime"
   ]
 }

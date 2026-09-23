@@ -7,7 +7,6 @@ export default defineConfig([
     '**/dist-*/**',
     'e2e/test-results/**',
     'e2e/playwright-report/**',
-    'packages/core/inspector-runtime/**',
   ]),
   js.configs.recommended,
   ts.configs.recommended,

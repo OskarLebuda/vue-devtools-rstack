@@ -1,34 +1,26 @@
 /**
- * Runtime entry for `appendTo` / preEntry mode - compiled by the USER's
- * bundler as part of the app graph (the alternative to HTML injection,
- * mirroring upstream's appendTo). Options come from the import query, or
- * from DefinePlugin when the bundler strips the query.
+ * Runtime entry for `appendTo` mode - compiled by the USER's bundler as part
+ * of the app graph (the alternative to HTML injection, mirroring upstream's
+ * appendTo). Options come from the import query, or from DefinePlugin when
+ * the bundler strips the query.
  */
-import { initVueDevTools } from '../overlay/init'
+import { install } from '../client/install'
 
-declare const __VUE_DEVTOOLS_RSPACK_OPTIONS__: {
-  base?: string
-  componentInspector?: boolean
-} | undefined
+declare const __VUE_DEVTOOLS_RSPACK_OPTIONS__: { base?: string } | undefined
 
-function readOptions(): { base: string, componentInspector: boolean } {
+function readBase(): string {
   const defined
     = typeof __VUE_DEVTOOLS_RSPACK_OPTIONS__ !== 'undefined' ? __VUE_DEVTOOLS_RSPACK_OPTIONS__ : undefined
 
-  let fromQuery: URLSearchParams | undefined
+  let fromQuery: string | null
   try {
-    fromQuery = new URL(import.meta.url).searchParams
+    fromQuery = new URL(import.meta.url).searchParams.get('base')
   }
   catch {
-    fromQuery = undefined
+    fromQuery = null
   }
 
-  return {
-    base: fromQuery?.get('base') ?? defined?.base ?? '/',
-    componentInspector: fromQuery?.has('inspector')
-      ? fromQuery.get('inspector') === '1'
-      : defined?.componentInspector ?? true,
-  }
+  return fromQuery ?? defined?.base ?? '/'
 }
 
-initVueDevTools(readOptions())
+install({ base: readBase() })

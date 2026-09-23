@@ -11,10 +11,10 @@ You normally don't depend on this directly - install one of the plugins above.
 
 It provides:
 
-- `createDevtoolsServer()` - mounts every dev-server endpoint (DevTools client SPA, overlay assets,
-  `@vite/client` shim, WebSocket/SSE transports, open-in-editor) and brings the RPC channel up.
-- `GraphCollector` - turns Rspack compilation stats into the module list the graph tab renders.
-- The prebundled overlay bootstrap (`dist/overlay-bootstrap.js`) served into the host page.
-- The vendored component-inspector loader (`./inspector-loader`) and runtime (`./inspector-runtime`).
+- `createDevtoolsServer()` - a single connect middleware for the dev server: a
+  [devframe](https://devfra.me) hub (floating dock, standalone viewer, RPC over WebSocket or SSE,
+  open-in-editor) with the Vue DevTools client SPA registered as a dock entry.
+- The prebundled in-page bootstrap (`dist/bootstrap.js`), and the runtime + loader
+  (`./runtime`, `./append-loader`) for `appendTo` mode.
 
 MIT. See the [project README](https://github.com/OskarLebuda/vue-devtools-rstack#readme).

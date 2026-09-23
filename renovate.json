@@ -12,12 +12,12 @@
   },
   "packageRules": [
     {
-      "description": "Vue DevTools packages move in lockstep with the prebuilt client and overlay assets - see docs/COMPATIBILITY.md. Group them so a bump is reviewed as one change.",
+      "description": "Vue DevTools and the devframe hub move in lockstep with the prebuilt client - see docs/COMPATIBILITY.md. Group them so a bump is reviewed as one change.",
       "matchPackageNames": [
         "vite-plugin-vue-devtools",
-        "@vue/devtools-core",
-        "@vue/devtools-kit",
-        "@vue/devtools-shared"
+        "devframe",
+        "@devframes/hub",
+        "@devframes/hub-ui"
       ],
       "groupName": "vue devtools (pinned, lockstep)",
       "labels": ["dependencies", "vue-devtools"],

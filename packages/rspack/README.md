@@ -14,8 +14,8 @@ parity with `vite-plugin-vue-devtools`.
 pnpm add -D @vue-devtools-rstack/rspack
 ```
 
-The integration has two halves: a **compiler plugin** (overlay injection, component-inspector
-transform, module-graph collection) and **dev-server middlewares** (DevTools client, RPC channel,
+The integration has two halves: a **compiler plugin** (injects the in-page bootstrap) and
+**dev-server middlewares** (the devframe hub with its dock and RPC, the DevTools client,
 open-in-editor). Both must be registered.
 
 ```js
@@ -27,17 +27,14 @@ import { VueLoaderPlugin } from 'vue-loader'
 
 const PORT = 3000
 
-const devtools = new VueDevToolsRspackPlugin()
-const devtoolsServer = createDevtoolsMiddlewares({
-  collector: devtools.collector, // shares module-graph data with the graph tab
-})
+const devtoolsServer = createDevtoolsMiddlewares()
 
 export default {
   mode: 'development',
   plugins: [
     new VueLoaderPlugin(),
     new rspack.HtmlRspackPlugin({ template: './index.html' }),
-    devtools,
+    new VueDevToolsRspackPlugin(),
   ],
   devServer: {
     port: PORT,
@@ -64,12 +61,13 @@ HTML entry, use the `appendTo` option instead.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `base` | `string` | `'/'` | Dev-server base path; must match `createDevtoolsMiddlewares({ base })`. |
-| `componentInspector` | `boolean \| object` | `true` | Click-to-source picker. |
-| `launchEditor` | `string` | `LAUNCH_EDITOR ?? 'code'` | Editor for open-in-editor. |
-| `appendTo` | `string \| RegExp` | `''` | Import the overlay from a matching module instead of injecting a script tag. |
+| `enabled` | `boolean` | `true` | Install Vue DevTools. |
+| `appendTo` | `string \| RegExp \| Array<string \| RegExp>` | - | Import the devtools from matching modules instead of injecting a script tag. |
 
-`createDevtoolsMiddlewares(options)` takes the same options plus `root` (default `process.cwd()`),
-`publicDir` (default `<root>/public`), `distPath`, and `collector`.
+`createDevtoolsMiddlewares(options)` takes `base`, `enabled`, `root` (default `process.cwd()`;
+open-in-editor refuses files outside the workspace), `launchEditor`, `embeddedVisibility`,
+`dockPreferences` and `allowedOrigins` - see the
+[project README](https://github.com/OskarLebuda/vue-devtools-rstack#options).
 
 MIT. Consumes the prebuilt Vue DevTools client from `vite-plugin-vue-devtools` (MIT, © webfansplz
 and the vuejs/devtools contributors).

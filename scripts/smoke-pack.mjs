@@ -84,47 +84,26 @@ async function verify() {
 
   try {
     await page.goto(`http://localhost:${PORT}/`)
-    await page.waitForSelector('#__vue-devtools-container__', { state: 'attached', timeout: 20_000 })
-    checks.push('overlay mounted')
+    const dockButton = page.locator('devframes-dock-embedded button[aria-label="Vue DevTools"]')
+    await dockButton.waitFor({ state: 'attached', timeout: 20_000 })
+    checks.push('dock mounted with the Vue DevTools entry (hub RPC)')
 
-    await page.waitForFunction(() => !!window.__VUE_INSPECTOR__, { timeout: 20_000 })
-    const attr = await page
-      .locator('[data-v-inspector*="App.vue"]')
-      .first()
-      .getAttribute('data-v-inspector')
-    if (!/App\.vue:\d+:\d+$/.test(attr ?? ''))
-      throw new Error(`unexpected data-v-inspector value: ${attr}`)
-    checks.push(`component inspector (${attr})`)
-
-    // The overlay app may still be hydrating; retry until the panel opens.
+    // The dock may still be hydrating; retry until the panel opens.
+    const iframe = page.locator('iframe[src*="__devtools__/"]')
     let opened = false
     for (let i = 0; i < 10 && !opened; i++) {
-      await page.locator('#__vue-devtools-container__ .panel-entry-btn').click({ force: true })
-      opened = await page
-        .waitForSelector('#vue-devtools-iframe', { state: 'visible', timeout: 2000 })
+      await dockButton.click({ force: true })
+      opened = await iframe
+        .waitFor({ state: 'visible', timeout: 2000 })
         .then(() => true)
         .catch(() => false)
     }
     if (!opened)
       throw new Error('devtools panel never opened')
 
-    const frame = await (await page.$('#vue-devtools-iframe')).contentFrame()
+    const frame = await (await iframe.elementHandle()).contentFrame()
     await frame.waitForFunction(() => document.body.innerText.includes('App'), { timeout: 20_000 })
-    checks.push('devtools panel + component tree (channel A)')
-
-    await page.goto(`http://localhost:${PORT}/__devtools__/`)
-    const heartbeat = await page.evaluate(async () => {
-      const start = Date.now()
-      while (!window.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) {
-        if (Date.now() - start > 20_000)
-          throw new Error('vite rpc client never initialized')
-        await new Promise(r => setTimeout(r, 100))
-      }
-      return window.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__.heartbeat()
-    })
-    if (heartbeat !== true)
-      throw new Error('channel B heartbeat did not resolve')
-    checks.push('channel B heartbeat')
+    checks.push('devtools panel + component tree')
 
     if (errors.length)
       throw new Error(`page errors: ${errors.join('; ')}`)

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { openDevtoolsPanel } from './helpers'
+import { clickInApp, openDevtoolsPanel } from './helpers'
 
 test('editing component state in devtools updates the live app', async ({ page }) => {
   await page.goto('/state')
@@ -12,12 +12,12 @@ test('editing component state in devtools updates the live app', async ({ page }
 
   // The state pane lists `amount: 42`; hovering the row reveals quick-edit
   // buttons for numbers (+1 / -1).
-  const row = frame.locator('.font-state-field').filter({ hasText: 'amount' }).first()
+  const row = frame.locator('.group\\/state-row').filter({ hasText: 'amount' }).first()
   await expect(row).toBeVisible()
   await row.hover()
-  await row.locator('.i-carbon-add').first().click({ force: true })
+  await row.getByRole('button', { name: 'Increment state value' }).click({ force: true })
 
-  // Round-trip: devtools edit → devtools-kit state editor → live app DOM.
+  // Round-trip: devtools edit → in-page RPC → live app DOM.
   await expect(page.getByTestId('amount')).toHaveText('amount: 43')
 })
 
@@ -26,18 +26,15 @@ test('state changed in the app is reflected in the devtools pinia tab', async ({
   const frame = await openDevtoolsPanel(page)
 
   // The pinia tab only exists once the store's devtools plugin registered.
-  await frame.locator('a[href="/pinia"], a[href$="/pinia"]').first().click()
-  await expect(frame.locator('body')).toContainText('counter')
-
-  // Expand the store's reactive state node to reveal its fields.
-  await frame.locator('.font-state-field').filter({ hasText: 'Reactive' }).first().click()
+  await frame.locator('a[href="/inspectors/pinia"]').click()
+  await frame.locator('body').getByText('counter', { exact: true }).first().click()
   await expect(frame.locator('body')).toContainText('playground-counter')
 
   // Trigger a pinia action from the app itself...
-  await page.getByTestId('increment').click()
+  await clickInApp(page.getByTestId('increment'))
   await expect(page.getByTestId('count')).toContainText('Count: 1')
 
-  // ...and the devtools pinia pane picks it up over channel A.
+  // ...and the devtools pinia pane picks it up.
   await expect
     .poll(() => frame.locator('body').innerText(), { timeout: 10_000 })
     .toMatch(/count[\s\S]{0,20}\b1\b/i)

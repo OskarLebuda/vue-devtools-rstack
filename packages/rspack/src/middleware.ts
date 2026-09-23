@@ -3,13 +3,12 @@ import type { Http2SecureServer } from 'node:http2'
 import type {
   ConnectMiddleware,
   DevtoolsServer,
-  GraphCollector,
   VueDevToolsOptions,
 } from '@vue-devtools-rstack/core'
-import path from 'node:path'
 import process from 'node:process'
 import {
   createDevtoolsServer,
+  getHubBase,
   normalizeBase,
   resolveVueDevToolsOptions,
 } from '@vue-devtools-rstack/core'
@@ -18,36 +17,26 @@ import { bold, cyan, green } from 'kolorist'
 export interface DevtoolsMiddlewareOptions extends VueDevToolsOptions {
   /** Dev-server base path. @default '/' */
   base?: string
-  /** Project root used for the assets tab. @default process.cwd() */
+  /** Project root; open-in-editor refuses files outside it. @default process.cwd() */
   root?: string
-  /** Absolute public dir, or '' to disable the public-dir stripping. */
-  publicDir?: string
-  /** Build output dir, excluded from the assets watcher. */
-  distPath?: string
-  /**
-   * The plugin instance, so the graph tab shares its collected module data.
-   * Pass the same `VueDevToolsRspackPlugin` you added to `plugins`.
-   */
-  collector?: GraphCollector
 }
 
 export interface DevtoolsMiddlewareSetup {
   /** Middleware entries for `devServer.setupMiddlewares`. */
-  middlewares: { name: string, path: string, middleware: ConnectMiddleware }[]
-  /** Call from `devServer.options.onListening` to enable the WebSocket. */
+  middlewares: { name: string, middleware: ConnectMiddleware }[]
+  /** Call from `devServer.setupMiddlewares` to enable the WebSocket. */
   attach: (httpServer: HttpServer | Http2SecureServer | null | undefined) => void
-  close: () => void
+  close: () => Promise<void>
 }
 
 /**
  * Dev-server half of the Vue DevTools integration for raw Rspack setups.
  *
  * ```js
- * const plugin = new VueDevToolsRspackPlugin()
- * const devtools = createDevtoolsMiddlewares({ collector: plugin.collector })
+ * const devtools = createDevtoolsMiddlewares()
  *
  * module.exports = {
- *   plugins: [plugin],
+ *   plugins: [new VueDevToolsRspackPlugin()],
  *   devServer: {
  *     setupMiddlewares: (middlewares, devServer) => {
  *       devtools.attach(devServer.server)
@@ -64,42 +53,30 @@ export function createDevtoolsMiddlewares(
   const resolved = resolveVueDevToolsOptions(options)
   const base = normalizeBase(options.base)
   const root = options.root ?? process.cwd()
-  const publicDir = options.publicDir ?? path.join(root, 'public')
 
-  const middlewares: DevtoolsMiddlewareSetup['middlewares'] = []
   let server: DevtoolsServer | undefined
   let httpServer: HttpServer | Http2SecureServer | null | undefined
 
-  const start = () => {
-    server = createDevtoolsServer({
-      base,
-      root,
-      publicDir,
-      distPath: options.distPath,
-      options: resolved,
-      collector: options.collector,
-      httpServer,
-      use: (mountPath, middleware) => {
-        middlewares.push({ name: `vue-devtools:${mountPath}`, path: mountPath, middleware })
-      },
-    })
+  const start = (): DevtoolsServer => {
+    server ??= createDevtoolsServer({ base, root, options: resolved, httpServer })
+    return server
   }
 
   return {
     get middlewares() {
-      if (!server)
-        start()
-      return middlewares
+      if (!resolved.enabled)
+        return []
+      return [{ name: 'vue-devtools', middleware: start().middleware }]
     },
     attach(server_) {
       httpServer = server_
       // Attaching must happen before the middlewares are materialized so the
       // WebSocket transport is chosen over the SSE fallback.
-      if (!server)
+      if (resolved.enabled)
         start()
     },
-    close() {
-      server?.close()
+    async close() {
+      await server?.close()
       server = undefined
     },
   }
@@ -107,11 +84,7 @@ export function createDevtoolsMiddlewares(
 
 /** Prints the DevTools banner, mirroring the rsbuild plugin's output. */
 export function printDevtoolsBanner(port: number, base = '/'): void {
-  const url = `http://localhost:${port}${normalizeBase(base)}__devtools__/`
+  const url = `http://localhost:${port}${getHubBase(normalizeBase(base))}`
   // eslint-disable-next-line no-console
   console.log(`  ${green('➜')}  ${bold('Vue DevTools')}: Open ${cyan(url)} as a separate window`)
-  // eslint-disable-next-line no-console
-  console.log(
-    `  ${green('➜')}  ${bold('Vue DevTools')}: Press ${cyan('Option(⌥)+Shift(⇧)+D')} in App to toggle the Vue DevTools`,
-  )
 }

@@ -11,8 +11,7 @@ const appDir = path.resolve(
   '../../playground/rsbuild-app',
 )
 
-// Build outside the playground: anything written inside it would be picked up
-// by the assets tab (and its watcher), racing the assets specs.
+// Build outside the playground, so the dev-server specs never see the output.
 const outRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'vue-devtools-prod-'))
 
 function build(distDir: string, withPlugin: boolean) {
@@ -60,7 +59,8 @@ test('production build is unaffected by the plugin', async () => {
       .map(file => fs.readFileSync(path.join(withDir, file), 'utf-8'))
       .join('\n')
     expect(bundle).not.toContain('__vue-devtools__')
-    expect(bundle).not.toContain('data-v-inspector')
+    expect(bundle).not.toContain('__devtools/')
+    expect(bundle).not.toContain('__VUE_DEVTOOLS_VITE_RUNTIME__')
   }
   finally {
     fs.rmSync(outRoot, { recursive: true, force: true })

@@ -4,5 +4,5 @@
     "types": ["node"],
     "rootDir": "."
   },
-  "include": ["tests", "tests-rspack", "tests-variants", "tests-build", "globals.d.ts", "*.config.ts"]
+  "include": ["tests", "tests-rspack", "tests-variants", "tests-build", "*.config.ts"]
 }

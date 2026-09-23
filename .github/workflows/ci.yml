@@ -49,13 +49,15 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --no-frozen-lockfile
+      # v9 is only published under the `beta` tag; switch back to `latest`
+      # once it goes stable.
       - name: Upgrade to the latest Vue DevTools
         run: |
           pnpm --filter @vue-devtools-rstack/core add \
-            vite-plugin-vue-devtools@latest \
-            @vue/devtools-core@latest \
-            @vue/devtools-kit@latest \
-            @vue/devtools-shared@latest
+            vite-plugin-vue-devtools@beta \
+            devframe@latest \
+            @devframes/hub@latest \
+            @devframes/hub-ui@latest
       - run: pnpm build
       - run: pnpm --filter e2e exec playwright install --with-deps chromium
       - run: pnpm e2e
