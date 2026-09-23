@@ -5,11 +5,36 @@
 | This project | Vue DevTools upstream | Notes |
 | --- | --- | --- |
 | 0.1.x | `vite-plugin-vue-devtools@8.1.5`, `@vue/devtools-{core,kit,shared}@8.1.5` | Verified against Rsbuild 2.1.x, Rspack 2.1.x, `@rspack/dev-server` 2.1.x, Vue 3.5, vue-router 5, pinia 4, TypeScript 7. |
+| next | `vite-plugin-vue-devtools@9.0.0-beta.0`, `devframe@1.0.0`, `@devframes/hub@1.0.0`, `@devframes/hub-ui@1.0.0` | Same toolchain as above. |
 
 `vite-plugin-vue-devtools` is pinned **exactly**. It is not used as a plugin - it is the donor of
-the prebuilt client SPA (`client/`) and overlay bundle (`overlay/devtools-overlay.mjs` + `.css`),
-which must stay in lockstep with the `@vue/devtools-kit` protocol version we bundle into the
-overlay bootstrap.
+the prebuilt client SPA (`client/`, including `dock-client.js`) and of the in-page installer
+(`vite-plugin-vue-devtools/client`) we bundle into the bootstrap. The two must speak the same
+`@vue/devtools-kit` protocol, which upstream pins exactly. The devframe packages are pinned exactly
+too: the embedded dock, the hub server and the client SPA's devframe RPC client have to agree.
+
+`vite-plugin-vue-devtools@9` declares `vite@^8.3` and `@vitejs/devtools` as peers. Package managers
+that auto-install peers will pull them in; nothing here imports them at runtime.
+
+## Architecture (v9)
+
+Vue DevTools v9 no longer ships its own overlay or server RPC. Under Vite, the page runs the
+`virtual:vue-devtools-client` module (devtools hook + an in-page RPC host), the client SPA talks to
+it over `postMessage` from inside an iframe, and Vite DevTools supplies the dock around that iframe
+plus a devframe RPC server (used by the SPA only for `vite:core:open-in-editor`).
+
+Vite DevTools is itself a branded [devframe](https://devfra.me) hub, and the hub is
+framework-agnostic, so we host one directly:
+
+| Route | Served by | Vite equivalent |
+| --- | --- | --- |
+| `${base}__vue-devtools__/bootstrap.js` | `packages/core/client/` (prebundled) | `virtual:vue-devtools-client` + Vite DevTools' `embedded.js` injection |
+| `${base}__devtools/` | `initHub()` from `@devframes/hub` with `createUi()` from `@devframes/hub-ui`: dock (`embedded.js`), standalone viewer, `__connection.json`, WebSocket (`__ws`) / SSE (`__sse`) RPC | `@vitejs/devtools` |
+| `${base}__devtools__/` | `sirv` over the client SPA | `ctx.views.hostStatic` in vite-plugin-vue-devtools |
+
+The dock entry registration in `packages/core/src/server.ts` is a copy of vite-plugin-vue-devtools's
+`devtools.setup(ctx)`, and the open-in-editor RPC mirrors `@vitejs/devtools`'s built-in one. The
+client SPA is served outside the hub because the hub only routes requests under its own base.
 
 ## Toolchain
 
@@ -34,11 +59,10 @@ affect what our packages are checked or built with.
 
 One Rslib quirk is worth knowing about: it deliberately leaves `process.env.NODE_ENV` for the
 consumer's bundler, and neither `source.define` nor `optimization.nodeEnv` reaches the bundled
-`node_modules` in a library build. The overlay bootstrap is served straight to the browser, where
-`process` does not exist at all, so it threw `ReferenceError: process is not defined` on load. A
-`BannerPlugin` now declares `process` at the emitted module's top level — module-scoped, so
-nothing is added to `globalThis`. See the third `lib` entry in
-`packages/core/rslib.config.ts`.
+`node_modules` in a library build. The v8 bootstrap needed a `BannerPlugin` shim for that; the v9
+bootstrap has no `process` references, so the shim is gone. If a future upstream bump brings
+`process.env` back into the bundled code, the bootstrap will throw `ReferenceError: process is
+not defined` on load - check `dist/bootstrap.js`.
 
 ## Module format
 
@@ -46,71 +70,58 @@ All packages are **ESM only**; no CommonJS build is produced. Node 20.19+ / 22.1
 which is where `require(esm)` is available - so consumers with a CommonJS `rspack.config.js` can
 still `require()` these packages.
 
-This extends to the Rspack loaders (`loader.mjs`, `append-loader.mjs`), which are plain ESM
-modules with a default export - Rspack accepts them, covered by the `tests-rspack` leg. Package
+This extends to the `appendTo` Rspack loader (`append-loader.mjs`), a plain ESM
+module with a default export, which Rspack accepts (no e2e leg covers `appendTo` yet). Package
 paths are resolved with `import.meta.resolve` rather than `createRequire`.
 
 ## Verified environment findings
 
 - **Rsbuild exposes the Node HTTP server.** `onBeforeStartDevServer({ server })` gives
   `server.httpServer` (`http.Server | Http2SecureServer | null`, null only in `middlewareMode`).
-  The WebSocket transport attaches to its `'upgrade'` event, scoped to the
-  `${base}__vue-devtools-ws__` pathname so Rsbuild's own HMR socket is untouched.
+  It is handed to `initHub({ server })`, which attaches to its `'upgrade'` event scoped to
+  `${base}__devtools/__ws`, so Rsbuild's own HMR socket is untouched.
 - **`@rspack/dev-server` exposes it as `devServer.server`** inside `setupMiddlewares`.
-- **SSE fallback** (`${base}__vue-devtools-sse__` + `${base}__vue-devtools-send__`) is used
-  automatically when no HTTP server is reachable, and can be forced with
-  `VUE_DEVTOOLS_RSPACK_FORCE_SSE=1`. Covered by `e2e/tests-variants/sse-fallback.spec.ts`.
-- **`vite-hot-client` contract** (bundled inside the pinned client SPA): it fetches
-  `${base}@vite/client`, rejects the response unless the content type contains `javascript` and the
-  body does not start with `<`, then imports it and calls the exported `createHotContext(path)`,
-  which must **synchronously** return `{ on(event, cb), send(event, data) }`.
-- **`@vue/devtools-kit` server contract**: `setViteServerContext(ctx)` only ever reads
-  `ctx.hot ?? ctx.ws` and calls `.send(event, payload)` / `.on(event, cb)`. Payloads are SuperJSON
-  **strings** and must reach `on` handlers verbatim. Event key:
-  `__devtools-kit-vite-messaging-event-key__`.
+- **SSE fallback** (`${base}__devtools/__sse`) is used automatically when no HTTP server is
+  reachable, and can be forced with `VUE_DEVTOOLS_RSPACK_FORCE_SSE=1`. `__connection.json` then
+  advertises `backend: 'sse'`. Covered by `e2e/tests-variants/sse-fallback.spec.ts`.
+- **The client SPA finds its connection** through the `__DEVFRAME_CONNECTION__` global that the
+  dock sets on the parent window, falling back to `./__connection.json`. We serve the hub's
+  metadata at `${base}__devtools__/__connection.json` too, for the SPA opened as its own window.
+- **Auth is off** (`auth: false`). Vite DevTools gates clients behind a one-time code by default;
+  the hub here only accepts loopback origins on its socket (plus `allowedOrigins`), and the only
+  server capability, open-in-editor, refuses paths outside the workspace root.
+- **`__file` is project-relative under vue-loader** (absolute under Vite), so open-in-editor
+  resolves relative paths against the project root, not devframe's workspace root.
 
 ## Deviations from upstream
 
-- **Vite Inspect tab is absent.** Upstream adds it via `addCustomTab` as an iframe onto
-  `vite-plugin-inspect`'s UI. There is no Rspack equivalent; the module graph tab covers the same
-  need.
-- **Component picker is vendored, not delegated.** `unplugin-vue-inspector@3.0.0` turned out to be
-  a thin `createUnplugin` wrapper that only populates the `vite` hook - it has no working
-  webpack/rspack path. We therefore vendor the template transform from
-  `vite-plugin-vue-inspector@6.0.0` (`packages/core/src/inspector/transform.ts`) as an
-  `enforce: 'pre'` Rspack loader, and its `Overlay.vue` runtime
-  (`packages/core/inspector-runtime/`). Two vendoring changes are marked in the source:
-  the Vue 2 mounting branch is dropped (Rspack's strict ESM linking rejects `Vue.default` against
-  Vue 3), and `openInEditor` resolves its URL against `window.location.href` instead of
-  `import.meta.url`. JSX/TSX source locations are not yet ported (templates only).
-- **`/__open-in-editor` is always ours.** Upstream gets it from `vite-plugin-vue-inspector`'s
-  dev-server middleware; we mount `launch-editor-middleware` directly.
-- **Graph data comes from Rspack stats**, not `vite-plugin-inspect`. Node ids are absolute resource
-  paths (`module.nameForCondition`, falling back to the segment of `identifier` after the last
-  `!`), `.vue?vue&type=…` sub-requests collapse into the parent SFC, and forward `deps` are built
-  by inverting `reasons[]`. See `packages/core/src/graph/collector.ts`.
-- **Assets watcher is our own chokidar instance** rather than `server.watcher`.
-
-## Known behavioral notes
-
-- The assets tab initializes its extension filter once (upstream `watchOnce`). A file added later
-  with an extension that was not present at load time stays hidden until the tab is remounted -
-  identical behavior under Vite.
+- **The dock is devframe's reference UI, unbranded**, rather than the Vite DevTools-branded one,
+  and it has no other entries (Vite, Rolldown, terminals...) - only Vue DevTools and settings.
+- **Removed in v9 upstream, removed here:** the `componentInspector` option (component picking is
+  built into the client SPA and passing the option now logs a warning), and the assets, module graph
+  and Vite Inspect tabs, together with the Rspack stats collector and assets watcher that fed them.
+- **`launchEditor` is kept.** Upstream dropped it because Vite DevTools owns open-in-editor now;
+  here we own it, so the option still picks the editor.
+- **`embeddedVisibility`, `dockPreferences` and `allowedOrigins`** are top-level plugin options.
+  Under Vite they are Vite DevTools settings (`devtools: { ... }`).
 
 ## Upgrade procedure
 
 When bumping the pinned upstream version:
 
-1. Bump `vite-plugin-vue-devtools` and `@vue/devtools-{core,kit,shared}` together in
-   `packages/core/package.json`.
-2. Re-diff these upstream files and mirror any changes:
-   - `packages/vite/src/overlay.js` → `packages/core/overlay/init.ts`
-   - `packages/vite/src/vite.ts` (`configureServer`, `transformIndexHtml`) → `packages/core/src/server.ts`, `html.ts`
-   - `packages/vite/src/rpc/{index,assets,graph,get-config}.ts` → `packages/core/src/rpc/*`
-   - `packages/devtools-kit/src/messaging/presets/vite/*` → `packages/core/src/transport/*`
-   - `packages/client/src/main.ts` (hot-context acquisition) → `packages/core/src/middlewares/vite-client-shim.ts`
-3. Run the full e2e suite: `pnpm e2e` (rsbuild, raw rspack, and variant legs).
-4. Update the version matrix above.
+1. Bump `vite-plugin-vue-devtools` together with `devframe`, `@devframes/hub` and
+   `@devframes/hub-ui` in `packages/core/package.json` (use the versions `@vitejs/devtools`
+   depends on).
+2. Re-diff these upstream sources and mirror any changes:
+   - `packages/vite/src/utils/dock/registration.ts` (dock entry) → `packages/core/src/server.ts`
+   - `packages/vite/src/client-injection.ts` (client module, `appendTo`) → `packages/core/client/install.ts`, `append-loader.mjs`
+   - `@vitejs/devtools` `src/node/rpc/index.ts` (`vite:core:open-in-editor`) → `packages/core/src/server.ts`
+   - `@vitejs/devtools` `src/node/plugins/injection.ts` (dock injection) → `packages/core/client/install.ts`
+3. Check that the client SPA still only calls `vite:core:open-in-editor` on the server:
+   `grep -ohE 'vite:[a-z:-]+' packages/core/node_modules/vite-plugin-vue-devtools/client/assets/*.js | sort -u`
+   should list only `vite:core:open-in-editor` (plus `vite:preload`, from Vite's own `vite:preloadError` event).
+4. Run the full e2e suite: `pnpm e2e` (rsbuild, raw rspack, variant and build legs).
+5. Update the version matrix above.
 
-A canary CI leg installs `vite-plugin-vue-devtools@latest` and runs the suite as
-allowed-to-fail, so breakage surfaces before a user hits it.
+A canary CI leg installs `vite-plugin-vue-devtools@beta` (switch to `@latest` once v9 is stable)
+and runs the suite as allowed-to-fail, so breakage surfaces before a user hits it.

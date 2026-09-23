@@ -1,5 +1,7 @@
 {
   "$schema": "https://cdn.jsdelivr.net/npm/@arethetypeswrong/cli/config-schema.json",
   "profile": "esm-only",
-  "excludeEntrypoints": ["inspector-loader", "append-loader", "inspector-runtime"]
+  "excludeEntrypoints": [
+    "append-loader"
+  ]
 }

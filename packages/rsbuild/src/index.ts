@@ -1,11 +1,11 @@
 import type { RsbuildPlugin } from '@rsbuild/core'
 import type { DevtoolsServer, VueDevToolsOptions } from '@vue-devtools-rstack/core'
-import { isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   createDevtoolsServer,
-  getBootstrapScriptTag,
-  GraphCollector,
+  getBootstrapUrl,
+  getHubBase,
+  matchesAppendTo,
   normalizeBase,
   resolveVueDevToolsOptions,
 } from '@vue-devtools-rstack/core'
@@ -22,116 +22,64 @@ export function pluginVueDevTools(options: VueDevToolsOptions = {}): RsbuildPlug
 
     setup(api) {
       const resolved = resolveVueDevToolsOptions(options)
-      const collector = new GraphCollector()
+      if (!resolved.enabled)
+        return
+
       let server: DevtoolsServer | undefined
 
       const isDev = () => api.context.action === 'dev'
       const getBase = () => normalizeBase(api.getNormalizedConfig().server.base)
 
-      // -- overlay injection --------------------------------------------------
+      // -- in-page bootstrap --------------------------------------------------
+      // First in <head>, so the devtools hook is installed before the app
+      // module runs createApp().
       api.modifyHTMLTags(({ headTags, bodyTags }) => {
-        if (!isDev() || resolved.appendTo)
+        if (!isDev() || resolved.appendTo.length)
           return { headTags, bodyTags }
-        headTags.unshift(getBootstrapScriptTag(getBase(), resolved))
+        headTags.unshift({ tag: 'script', attrs: { type: 'module', src: getBootstrapUrl(getBase()) } })
         return { headTags, bodyTags }
       })
 
-      // -- component inspector (click-to-source) ------------------------------
-      if (resolved.componentInspector) {
-        api.modifyRsbuildConfig((config) => {
-          if (!isDev())
-            return config
-          const runtime = resolvePath('@vue-devtools-rstack/core/inspector-runtime')
-          config.source ??= {}
-          const pre = config.source.preEntry
-          config.source.preEntry = [
-            ...(Array.isArray(pre) ? pre : pre ? [pre] : []),
-            runtime,
-          ]
-          return config
-        })
-
-        api.modifyRspackConfig((config, { rspack }) => {
+      if (resolved.appendTo.length) {
+        api.modifyRspackConfig((config) => {
           if (!isDev())
             return
-          const inspectorOptions
-            = typeof resolved.componentInspector === 'object' ? resolved.componentInspector : {}
           config.module ??= {}
           config.module.rules ??= []
-          // `enforce: 'pre'` so the transform sees the original SFC source,
-          // before vue-loader splits the blocks.
           config.module.rules.unshift({
-            test: /\.vue$/,
-            exclude: /node_modules/,
+            test: (resource: string) => matchesAppendTo(resource, resolved.appendTo),
             enforce: 'pre',
-            use: [{ loader: resolvePath('@vue-devtools-rstack/core/inspector-loader') }],
+            use: [{
+              loader: resolvePath('@vue-devtools-rstack/core/append-loader'),
+              options: { base: getBase() },
+            }],
           })
-          config.plugins ??= []
-          config.plugins.push(
-            new rspack.DefinePlugin({
-              __VUE_INSPECTOR_OPTIONS__: JSON.stringify({
-                ...inspectorOptions,
-                base: getBase(),
-              }),
-            }),
-          )
         })
       }
-
-      // -- module graph -------------------------------------------------------
-      api.onAfterDevCompile(({ stats }) => {
-        collector.handleStatsJson(
-          stats.toJson({
-            all: false,
-            modules: true,
-            reasons: true,
-            ids: true,
-            cachedModules: true,
-          }),
-        )
-      })
 
       // -- dev server ---------------------------------------------------------
       api.onBeforeStartDevServer(({ server: devServer }) => {
         server = createDevtoolsServer({
           base: getBase(),
           root: api.context.rootPath,
-          publicDir: resolvePublicDir(),
-          distPath: api.context.distPath,
           options: resolved,
-          collector,
           httpServer: devServer.httpServer,
-          use: (path, middleware) => devServer.middlewares.use(path, middleware),
         })
+        devServer.middlewares.use(server.middleware)
       })
 
-      api.onCloseDevServer(() => {
-        server?.close()
+      api.onCloseDevServer(async () => {
+        await server?.close()
         server = undefined
       })
 
       api.onAfterStartDevServer(({ port }) => {
         if (!isDev())
           return
-        const url = `http://localhost:${port}${getBase()}__devtools__/`
+        const url = `http://localhost:${port}${getHubBase(getBase())}`
         // eslint-disable-next-line no-console
-        console.log(
-          `  ${green('➜')}  ${bold('Vue DevTools')}: Open ${cyan(url)} as a separate window`,
-        )
-        // eslint-disable-next-line no-console
-        console.log(
-          `  ${green('➜')}  ${bold('Vue DevTools')}: Press ${cyan('Option(⌥)+Shift(⇧)+D')} in App to toggle the Vue DevTools`,
-        )
+        console.log(`  ${green('➜')}  ${bold('Vue DevTools')}: Open ${cyan(url)} as a separate window`)
       })
-
-      function resolvePublicDir(): string {
-        const publicDir = api.getNormalizedConfig().server.publicDir
-        if (!publicDir)
-          return ''
-        const first = Array.isArray(publicDir) ? publicDir[0] : publicDir
-        const name = (first && typeof first === 'object' ? first.name : undefined) ?? 'public'
-        return isAbsolute(name) ? name : join(api.context.rootPath, name)
-      }
     },
   }
 }

@@ -9,13 +9,7 @@ import { VueLoaderPlugin } from 'vue-loader'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = Number(process.env.PLAYGROUND_RSPACK_PORT) || 3344
 
-const devtools = new VueDevToolsRspackPlugin()
-const devtoolsServer = createDevtoolsMiddlewares({
-  root: __dirname,
-  publicDir: path.join(__dirname, 'public'),
-  distPath: path.join(__dirname, 'dist'),
-  collector: devtools.collector,
-})
+const devtoolsServer = createDevtoolsMiddlewares({ root: __dirname })
 
 export default {
   mode: 'development',
@@ -46,7 +40,7 @@ export default {
       __VUE_PROD_DEVTOOLS__: true,
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
     }),
-    devtools,
+    new VueDevToolsRspackPlugin(),
   ],
   devServer: {
     port: PORT,

@@ -6,7 +6,7 @@ const SSE_PORT = 3366
 
 /**
  * Edge-case legs: the plugin under a non-root `server.base`, and with the
- * WebSocket transport forced off so the SSE + POST fallback carries channel B.
+ * WebSocket transport forced off so the hub RPC falls back to SSE.
  */
 export default defineConfig({
   testDir: './tests-variants',

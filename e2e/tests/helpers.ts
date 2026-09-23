@@ -1,58 +1,55 @@
-import type { FrameLocator, Page } from '@playwright/test'
-import type { ViteRpcClient } from '../globals'
+import type { FrameLocator, Locator, Page } from '@playwright/test'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { expect } from '@playwright/test'
 
-/** Opens the floating DevTools panel and returns the client SPA iframe. */
+/** The Vue DevTools button in the devframe hub's floating dock. */
+export function dockButton(page: Page) {
+  return page.locator('devframes-dock-embedded button[aria-label="Vue DevTools"]')
+}
+
+/** The Vue DevTools client SPA iframe, rendered inside the dock. */
+export function devtoolsFrame(page: Page): FrameLocator {
+  return page.frameLocator('iframe[src*="__devtools__/"]')
+}
+
+/** Opens the Vue DevTools dock entry and returns the client SPA iframe. */
 export async function openDevtoolsPanel(page: Page): Promise<FrameLocator> {
-  const container = page.locator('#__vue-devtools-container__')
-  await expect(container).toBeAttached()
-  // The Vue-logo button inside the floating anchor toggles the panel. The
-  // overlay app may still be hydrating right after load, so retry the click
+  await expect(dockButton(page)).toBeAttached()
+  // The dock may still be hydrating right after load, so retry the click
   // until the iframe shows up.
   await expect(async () => {
-    await container.locator('.panel-entry-btn').click({ force: true, timeout: 2000 })
-    await expect(page.locator('#vue-devtools-iframe')).toBeVisible({ timeout: 2000 })
+    await dockButton(page).click({ force: true, timeout: 2000 })
+    await expect(page.locator('iframe[src*="__devtools__/"]')).toBeVisible({ timeout: 2000 })
   }).toPass({ timeout: 15_000 })
-  return page.frameLocator('#vue-devtools-iframe')
-}
-
-export function devtoolsFrame(page: Page): FrameLocator {
-  return page.frameLocator('#vue-devtools-iframe')
-}
-
-/** Waits for the client SPA to establish the dev-server ("vite") RPC channel. */
-export async function waitForViteRpc(page: Page): Promise<void> {
-  await page.waitForFunction(() => !!window.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__, undefined, {
-    timeout: 15_000,
-  })
+  const frame = devtoolsFrame(page)
+  // Connected once the components tab renders the live app tree.
+  await expect(frame.locator('body')).toContainText('App')
+  return frame
 }
 
 /**
- * Calls a server RPC function from the page, the same way the DevTools client
- * does. Must be run on a page that hosts the client SPA (`/__devtools__/`).
+ * Clicks an app element while the dock panel is open. The panel floats over
+ * the page, so a real pointer click would land on the dock instead.
  */
-export async function viteRpc<M extends keyof ViteRpcClient>(
-  page: Page,
-  method: M,
-  ...args: Parameters<ViteRpcClient[M]>
-): Promise<Awaited<ReturnType<ViteRpcClient[M]>>> {
-  await waitForViteRpc(page)
-  return page.evaluate(
-    ([name, callArgs]) => {
-      const rpc = window.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__!
-      const fn = rpc[name as keyof ViteRpcClient] as (...xs: unknown[]) => Promise<unknown>
-      return fn(...callArgs)
-    },
-    [method, args] as [string, unknown[]],
-  ) as Promise<Awaited<ReturnType<ViteRpcClient[M]>>>
+export async function clickInApp(target: Locator): Promise<void> {
+  await target.dispatchEvent('click')
 }
 
-/** Waits for the component-picker runtime to install its global. */
-export async function waitForInspector(page: Page): Promise<void> {
-  await page.waitForFunction(() => !!window.__VUE_INSPECTOR__, undefined, { timeout: 15_000 })
+/**
+ * Log written by `fixtures/fake-editor.mjs`, which the playground dev servers
+ * use as LAUNCH_EDITOR. One JSON line of editor arguments per launch.
+ */
+export const FAKE_EDITOR = fileURLToPath(new URL('../fixtures/fake-editor.mjs', import.meta.url))
+
+export function fakeEditorLog(name: string): string {
+  return path.join(os.tmpdir(), `vue-devtools-rstack-editor-${name}.log`)
 }
 
-export async function enableInspector(page: Page): Promise<void> {
-  await waitForInspector(page)
-  await page.evaluate(() => window.__VUE_INSPECTOR__!.enable())
+export function readEditorLaunches(log: string): string[][] {
+  if (!fs.existsSync(log))
+    return []
+  return fs.readFileSync(log, 'utf-8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line) as string[])
 }

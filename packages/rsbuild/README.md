@@ -22,23 +22,29 @@ export default defineConfig({
 })
 ```
 
-The overlay appears in your app during `rsbuild dev`; the panel is also served standalone at
-`/__devtools__/`. Production builds are untouched.
+The DevTools dock appears in your app during `rsbuild dev`; the standalone viewer is served at
+`/__devtools/`. Production builds are untouched.
 
 ## Options
 
 ```ts
 pluginVueDevTools({
-  // Click-to-source component picker. Pass an options object to configure the
-  // vendored vue-inspector overlay.
-  componentInspector: true,
+  // Install Vue DevTools and register its dock entry.
+  enabled: true,
+
+  // Import the devtools from matching modules instead of injecting a <script>
+  // tag - for apps without an HTML entry.
+  appendTo: undefined,
 
   // Editor launched by open-in-editor requests.
-  launchEditor: process.env.LAUNCH_EDITOR ?? 'code',
+  launchEditor: process.env.LAUNCH_EDITOR,
 
-  // Import the overlay from a matching module instead of injecting a <script>
-  // tag - for apps without an HTML entry.
-  appendTo: '',
+  // Floating dock: initial visibility and dock-bar preferences.
+  embeddedVisibility: 'normal',
+  dockPreferences: undefined,
+
+  // Origins allowed on the DevTools socket besides loopback (LAN, tunnels).
+  allowedOrigins: [],
 })
 ```
 

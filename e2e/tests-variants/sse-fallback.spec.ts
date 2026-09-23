@@ -1,20 +1,21 @@
 import { expect, test } from '@playwright/test'
-import { viteRpc } from '../tests/helpers'
+import { openDevtoolsPanel } from '../tests/helpers'
 
 const BASE_URL = 'http://localhost:3366/'
 
-test('channel B works over the SSE + POST fallback transport', async ({ page }) => {
+test('hub RPC works over the SSE fallback transport', async ({ page, request }) => {
+  const meta = await (await request.get(`${BASE_URL}__devtools/__connection.json`)).json()
+  expect(meta.backend).toBe('sse')
+
   const sockets: string[] = []
   page.on('websocket', ws => sockets.push(ws.url()))
 
-  await page.goto(`${BASE_URL}__devtools__/`)
+  // The dock entry is registered server-side, so the dock rendering it and
+  // opening the client proves RPC flows over SSE.
+  await page.goto(BASE_URL)
+  const frame = await openDevtoolsPanel(page)
+  await expect(frame.locator('body')).toContainText('HomePage')
 
-  expect(await viteRpc(page, 'heartbeat')).toBe(true)
-
-  // No devtools WebSocket was opened - the shim went straight to SSE.
-  expect(sockets.filter(url => url.includes('__vue-devtools-ws__'))).toEqual([])
-
-  // Real RPC payloads flow both ways over SSE/POST.
-  const assets = await viteRpc(page, 'getStaticAssets')
-  expect(assets.some(a => a.path === 'logo.svg')).toBe(true)
+  // No devtools WebSocket was opened.
+  expect(sockets.filter(url => url.includes('__devtools/'))).toEqual([])
 })
