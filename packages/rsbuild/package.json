@@ -1,7 +1,7 @@
 {
   "name": "@vue-devtools-rstack/rsbuild",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0-beta.0",
   "description": "An Rsbuild plugin for Vue DevTools - feature parity with vite-plugin-vue-devtools",
   "license": "MIT",
   "author": "Oskar Lebuda",
